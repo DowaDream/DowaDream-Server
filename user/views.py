@@ -5,12 +5,11 @@ from config.settings import get_secret
 
 # 구글 소셜로그인 변수 설정
 BASE_URL = get_secret("BASE_URL")
-GOOGLE_CALLBACK_URI = BASE_URL + 'user/google/callback/'
+GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
 # 구글 로그인
 def google_login(request):
-    scope = "https://www.googleapis.com/auth/userinfo.email " + \
-            "https://www.googleapis.com/auth/drive.readonly"
+    scope = "https://www.googleapis.com/auth/userinfo.email "
     client_id = get_secret("GOOGLE_CLIENT_ID")
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
@@ -35,7 +34,6 @@ def google_callback(request):
     ### 1-1. json으로 변환 & 에러 부분 파싱
     token_req_json = token_req.json()
     error = token_req_json.get("error")
-    print(token_req_json)
 
     ### 1-2. 에러 발생 시 종료
     if error is not None:
@@ -72,7 +70,7 @@ def google_callback(request):
 
         # 이미 Google로 제대로 가입된 유저 => 로그인 & 해당 유저의 jwt 발급
         data = {'access_token': access_token, 'code': code}
-        accept = requests.post(f"{BASE_URL}accounts/google/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
         accept_status = accept.status_code
 
         # 뭔가 중간에 문제가 생기면 에러
@@ -86,7 +84,7 @@ def google_callback(request):
     except User.DoesNotExist:
         # 전달받은 이메일로 기존에 가입된 유저가 아예 없으면 => 새로 회원가입 & 해당 유저의 jwt 발급
         data = {'access_token': access_token, 'code': code}
-        accept = requests.post(f"{BASE_URL}accounts/google/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
         accept_status = accept.status_code
 
         # 뭔가 중간에 문제가 생기면 에러

@@ -89,7 +89,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # 유효기간 7일
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
-    'TOKEN_USER_CLASS': 'accounts.Member',
+    'TOKEN_USER_CLASS': 'user.User',
 }
 
 MIDDLEWARE = [
