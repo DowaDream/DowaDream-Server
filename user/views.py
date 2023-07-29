@@ -5,6 +5,7 @@ from config.settings import get_secret
 
 # 구글 소셜로그인 변수 설정
 BASE_URL = get_secret("BASE_URL")
+CLIENT_URL = "https://www.google.com/"  # 임시로 redirect할 URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
 # 구글 로그인
@@ -45,30 +46,30 @@ def google_callback(request):
     # 성공 시 이메일 가져오기
     email_req_json = email_req.json()
     email = email_req_json.get('email')
-    # return JsonResponse({'access': access_token, 'email':email})
 
-    # 3. 전달받은 이메일, access_token, code를 바탕으로 회원가입/로그인
+    # 이메일, access_token, code를 바탕으로 회원가입/로그인
     try:
         user = User.objects.get(email=email)
         social_user = SocialAccount.objects.get(user=user)
         if social_user.provider != 'google':
             return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 이미 Google로 제대로 가입된 유저 => 로그인 & 해당 유저의 jwt 발급
+        # 이미 Google로 제대로 가입된 유저 => 로그인
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
         accept_status = accept.status_code
 
-        # 뭔가 중간에 문제가 생기면 에러
+        # 문제가 생기면 에러
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
 
         accept_json = accept.json()
         accept_json.pop('user', None)
-        return JsonResponse(accept_json)
+        return redirect("https://www.google.com/")
+    
 
     except User.DoesNotExist:
-        # 새로 회원가입 & 해당 유저의 jwt 발급
+        # 회원가입
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
         accept_status = accept.status_code
@@ -78,10 +79,9 @@ def google_callback(request):
 
         accept_json = accept.json()
         accept_json.pop('user', None)
-        return JsonResponse(accept_json)
+        return redirect("https://www.google.com/")
 
 
-# views.py
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
