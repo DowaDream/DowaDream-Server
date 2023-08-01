@@ -3,23 +3,30 @@ import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from datetime import timedelta
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-secret_file = os.path.join(BASE_DIR, 'secrets.json') # secrets.json 파일 위치를 명시
+# reading .env file
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(
+    env_file=os.path.join(BASE_DIR, '.env')
+)
+SECRET_KEY = env('SECRET_KEY')
+BASE_URL = env('BASE_URL')
+DB_NAME = env('DB_NAME')
+DB_USER = env('DB_USER')
+DB_PASSWORD = env('DB_PASSWORD')
+DB_HOST = env('DB_HOST')
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+GOOGLE_PASSWORD = env('GOOGLE_PASSWORD')
 
-with open(secret_file) as f:
-    secrets = json.loads(f.read())
-
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        error_msg = "Set the {} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
-
-SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -172,18 +179,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
-		'NAME': get_secret("DB_NAME"),
-		'USER': get_secret("DB_USER"),
-		'PASSWORD': get_secret("DB_PASSWORD"),
-		'HOST': get_secret("DB_HOST"),
+		'NAME': DB_NAME,
+		'USER': DB_USER,
+		'PASSWORD': DB_PASSWORD,
+		'HOST': DB_HOST,
 		'PORT': '3306',     # mysql은 3306 포트 사용
 	}
 }
 
 # S3 연결
 # AWS 권한 설정
-AWS_ACCESS_KEY_ID = get_secret('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = get_secret('AWS_SECRET_ACCESS_KEY')
+# AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+# AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
 AWS_REGION = 'ap-northeast-2'
 
 # AWS S3 버킷 이름

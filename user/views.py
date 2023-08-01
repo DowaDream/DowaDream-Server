@@ -1,17 +1,16 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
-from config.settings import get_secret
-
+from django.conf import settings
 
 # 구글 소셜로그인 변수 설정
-BASE_URL = get_secret("BASE_URL")
+BASE_URL = settings.BASE_URL
 CLIENT_URL = "https://www.google.com/"  # 임시로 redirect할 URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
 # 구글 로그인
 def google_login(request):
     scope = "https://www.googleapis.com/auth/userinfo.email "
-    client_id = get_secret("GOOGLE_CLIENT_ID")
+    client_id = settings.GOOGLE_CLIENT_ID
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
@@ -24,8 +23,8 @@ from rest_framework import status
 
 # Callback 함수
 def google_callback(request):
-    client_id = get_secret("GOOGLE_CLIENT_ID")
-    client_secret = get_secret("GOOGLE_PASSWORD")
+    client_id = settings.GOOGLE_CLIENT_ID
+    client_secret = settings.GOOGLE_PASSWORD
     code = request.GET.get('code')
     state = "random_state"
 
