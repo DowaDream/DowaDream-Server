@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.conf import settings
@@ -64,8 +65,11 @@ def google_callback(request):
 
         accept_json = accept.json()
         accept_json.pop('user', None)
-        return redirect("https://www.google.com/")
-    
+        
+        email_json = {'email': email}
+        response = requests.post(f"{BASE_URL}user/token/", data=email_json)
+        response_data = json.loads(response.text)
+        return JsonResponse(response_data, status=status.HTTP_201_CREATED)
 
     except User.DoesNotExist:
         # 회원가입
@@ -78,7 +82,39 @@ def google_callback(request):
 
         accept_json = accept.json()
         accept_json.pop('user', None)
-        return redirect("https://www.google.com/")
+        
+        email_json = {'email': email}
+        response = requests.post(f"{BASE_URL}user/token/", data=email_json)
+        response_data = json.loads(response.text)
+        return JsonResponse(response_data, status=status.HTTP_201_CREATED)
+
+
+# jwt 발급
+from rest_framework.views import APIView
+from rest_framework_simplejwt.serializers import RefreshToken
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+
+class JWTView(APIView):
+    def post(self, request):
+        if request.method == "POST":
+            email = request.data['email']
+            member = get_object_or_404(User, email=email)
+            token = RefreshToken.for_user(member)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            
+            data = {
+                'email': email,
+                'refresh_token': refresh_token,
+                'access_token': access_token
+            }
+            
+            return JsonResponse({
+                'status': status.HTTP_201_CREATED,
+                'data': data
+            })
+
 
 
 from dj_rest_auth.registration.views import SocialLoginView
