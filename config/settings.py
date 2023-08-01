@@ -17,7 +17,9 @@ environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
 SECRET_KEY = env('SECRET_KEY')
-BASE_URL = "dowadream.kro.kr"
+BASE_URL = "dowadream.kro.kr/"
+# BASE_URL = "http://localhost:8000/"
+
 DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
 DB_PASSWORD = env('DB_PASSWORD')
