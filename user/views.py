@@ -21,7 +21,7 @@ def google_login(request):
 # Callback 함수
 def google_callback(request):
     code = request.GET.get('code')
-    access_token = get_google_access_token(request, code)
+    access_token = get_google_access_token(code)
     email = get_google_email(access_token)
 
     try:
