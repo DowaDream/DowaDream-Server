@@ -9,7 +9,7 @@ from json import JSONDecodeError
 BASE_URL = settings.BASE_URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
-def get_google_access_token(request, code):
+def get_google_access_token(code):
     client_id = settings.GOOGLE_CLIENT_ID
     client_secret = settings.GOOGLE_PASSWORD
     state = "random_state"
