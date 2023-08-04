@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from config.permissions import IsWriterOrReadOnly
 from django.http import JsonResponse
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 
 from .models import *
 from .serializers import *
@@ -23,25 +24,10 @@ class ReviewList(APIView):
                 response = JsonResponse(ReviewTooManyImages(), status=400)
                 raise Exception()
             
-            review_serializer = ReviewSerializer(data=request.data)
-            if not review_serializer.is_valid():
-                response = JsonResponse(ReviewCreateFailed(review_serializer.errors), status=400)
+            review_serializer_data = save_review(request, images)
+            if isinstance(review_serializer_data, JsonResponse):
+                response = review_serializer_data
                 raise Exception()
-            review_instance = review_serializer.save()
-            
-            s3_urls = []
-            for image in images:
-                image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
-                if not image_serializer.is_valid():
-                    response = JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
-                    raise Exception()
-                s3_url = save_image(image, review_instance.rid)
-                s3_urls.append(s3_url)
-                image_serializer.validated_data["image"] = s3_url
-                image_serializer.save()
-            
-            review_serializer_data = review_serializer.data
-            review_serializer_data["images"] = s3_urls
             response = JsonResponse(ReviewCreateSuccessed(review_serializer_data), status=201)
         
         except:
@@ -60,6 +46,8 @@ class ReviewDetail(APIView):
     
     def put(self, request, rid):
         return
-    
+
     def delete(self, request, rid):
-        return
+        review = get_object_or_404(Review, rid=rid)
+        review.delete()
+        return JsonResponse(ReviewDeleteSuccess(rid), status=204)

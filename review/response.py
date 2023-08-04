@@ -1,3 +1,4 @@
+### 생성 관련 Response
 def ReviewCreateSuccessed(data):
     return {
         'status': 201,
@@ -29,4 +30,36 @@ def ReviewTooManyImages():
     return {
         'status': 400,
         'message': '이미지는 최대 5장까지 가능'
+    }
+
+
+
+
+### Review Detail 관련 Response
+def ReviewDetailGetSuccess(data):
+    return {
+        'status': 200,
+        'message': '리뷰 Detail 조회 성공',
+        'data': data
+    }
+
+def ReviewPutSuccess(data):
+    return {
+        'status': 200,
+        'message': '리뷰 Detail 조회 성공',
+        'data': data
+    }
+
+def ReviewPutFailed(err):
+    return {
+        'status': 400,
+        'message': '형식이 맞지 않음',
+        'error_message': err
+    }
+
+def ReviewDeleteSuccess(rid):
+    return {
+        'status': 204,
+        'message': '리뷰 삭제 성공',
+        'rid': rid
     }
