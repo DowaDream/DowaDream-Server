@@ -49,13 +49,6 @@ def ReviewPutSuccess(data):
         'data': data
     }
 
-def ReviewPutFailed(err):
-    return {
-        'status': 400,
-        'message': '형식이 맞지 않음',
-        'error_message': err
-    }
-
 def ReviewDeleteSuccess(rid):
     return {
         'status': 204,

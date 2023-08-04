@@ -33,8 +33,10 @@ class ReviewList(APIView):
 class ReviewDetail(APIView):
     def get(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
-        serializer = ReviewSerializer(review)
-        return JsonResponse(ReviewDetailGetSuccess(serializer.data), status=200)
+        images = Image.objects.filter(review__rid=rid)
+        review_data = ReviewSerializer(review).data
+        review_data["images"] = [{"image_id": image.image_id, "image": image.image.url} for image in images]
+        return JsonResponse(ReviewDetailGetSuccess(review_data), status=200)
     
     @transaction.atomic     # 오류 생기면 롤백
     def put(self, request, rid):
