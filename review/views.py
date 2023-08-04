@@ -22,12 +22,14 @@ class ReviewList(APIView):
         review_instance = review_serializer.save()
         
         images = request.data.getlist('images')
+        s3_urls = []
         
         for image in images:    # image 파일 validation 검사
             image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
             if not image_serializer.is_valid():
                 return JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
             s3_url = save_image(image, review_instance.rid)
+            s3_urls.append(s3_url)
             image_serializer.validated_data["image"] = s3_url
             image_serializer.save()
         
@@ -44,7 +46,12 @@ class ReviewList(APIView):
         # 모두 완료되면 commit
         # if 400 <= response.status_code < 600:
         #     transaction.set_rollback(True)
-        response = JsonResponse(ReviewCreateSuccessed(review_serializer.data), status=201)
+        
+        # 이미지 URL을 가져와서 review_serializer.data에 추가합니다.
+        review_serializer_data = review_serializer.data
+        review_serializer_data["images"] = s3_urls
+        
+        response = JsonResponse(ReviewCreateSuccessed(review_serializer_data), status=201)
         
         return response
     
