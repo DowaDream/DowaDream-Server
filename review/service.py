@@ -6,7 +6,40 @@ from .response import *
 from .serializers import *
 
 
-def save_image(image, rid):
+def save_review(request):
+    images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
+    if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
+        images = []
+    elif len(images) > 5:
+        return JsonResponse(ReviewTooManyImages(), status=400)
+    
+    review_serializer = ReviewSerializer(data=request.data)
+    review_instance = save_review_instance(review_serializer)
+    s3_urls = save_images_db(images, review_instance.rid)
+    
+    review_serializer_data = review_serializer.data
+    review_serializer_data["images"] = s3_urls
+    return review_serializer_data
+
+def put_review(request, review):
+    images = request.data.getlist('images', [])
+    if len(images[0]) == 0:
+        images = []
+    elif len(images) > 5:
+        return JsonResponse(ReviewTooManyImages(), status=400)
+    
+    review_serializer = ReviewSerializer(review, data=request.data) # 기존의 review를 수정
+    review_instance = save_review_instance(review_serializer)
+    s3_urls = save_images_db(images, review_instance.rid)
+    
+    review_serializer_data = review_serializer.data
+    review_serializer_data["images"] = s3_urls
+    return review_serializer_data
+
+
+
+
+def save_image_s3(image, rid):
     try:
         s3 = boto3.client('s3',
                           aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -23,56 +56,20 @@ def save_image(image, rid):
     except:
         return Exception("s3 이미지 업로드 실패")
 
+def save_review_instance(serializer):
+    if not serializer.is_valid():
+        return JsonResponse(ReviewFailed(serializer.errors), status=400)
+    review_instance = serializer.save()
+    return review_instance
 
-def save_review(request):
-    images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
-    if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
-        images = []
-    elif len(images) > 5:
-        return JsonResponse(ReviewTooManyImages(), status=400)
-    
-    review_serializer = ReviewSerializer(data=request.data)
-    if not review_serializer.is_valid():
-        return JsonResponse(ReviewFailed(review_serializer.errors), status=400)
-    review_instance = review_serializer.save()
-    
+def save_images_db(images, rid):
     s3_urls = []
     for image in images:
-        image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
+        image_serializer = ImageSerializer(data={"image": image, "review":rid})
         if not image_serializer.is_valid():
             return JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
-        s3_url = save_image(image, review_instance.rid)
+        s3_url = save_image_s3(image, rid)
         s3_urls.append(s3_url)
         image_serializer.validated_data["image"] = s3_url
         image_serializer.save()
-    
-    review_serializer_data = review_serializer.data
-    review_serializer_data["images"] = s3_urls
-    return review_serializer_data
-
-
-def put_review(request, review):
-    images = request.data.getlist('images', [])
-    if len(images[0]) == 0:
-        images = []
-    elif len(images) > 5:
-        return JsonResponse(ReviewTooManyImages(), status=400)
-    
-    review_serializer = ReviewSerializer(review, data=request.data)
-    if not review_serializer.is_valid():
-        return JsonResponse(ReviewFailed(review_serializer.errors), status=400)
-    review_instance = review_serializer.save()
-    
-    s3_urls = []
-    for image in images:
-        image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
-        if not image_serializer.is_valid():
-            return JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
-        s3_url = save_image(image, review_instance.rid)
-        s3_urls.append(s3_url)
-        image_serializer.validated_data["image"] = s3_url
-        image_serializer.save()
-    
-    review_serializer_data = review_serializer.data
-    review_serializer_data["images"] = s3_urls
-    return review_serializer_data
+    return s3_urls
