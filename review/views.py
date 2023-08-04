@@ -52,7 +52,7 @@ class ReviewDetail(APIView):
             return JsonResponse(ReviewDetailGetSuccess(review_data), status=200)
         except:
             return JsonResponse(ReviewDetailGetFail(), status=500)
-            
+    
     
     @transaction.atomic     # 오류 생기면 롤백
     def put(self, request, rid):
@@ -75,3 +75,21 @@ class ReviewDetail(APIView):
             return JsonResponse(ReviewDeleteSuccess(rid), status=204)
         except:
             return JsonResponse(ReviewDeleteFail(rid), status=500)
+
+
+
+### Comment ###
+class ComentList(APIView):
+    def get(self, request, rid):
+        review = get_object_or_404(Review, rid=rid)
+        comments = Comment.objects.filter(rid=review)
+        serializer = CommentSerializer(comments, many=True)
+        return JsonResponse(CommentGetSuccess(serializer.data), status=200)
+
+    def post(self, request, rid):
+        request.data['rid'] = rid
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(CommentCreateSuccess(serializer.data), status=201)
+        return JsonResponse(CommentCreateFail(serializer.errors), status=400)

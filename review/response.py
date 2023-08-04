@@ -1,4 +1,4 @@
-### 생성 관련 Response
+### Review 생성 관련 Response
 def ReviewCreateSuccessed(data):
     return {
         'status': 201,
@@ -79,4 +79,27 @@ def ReviewDeleteFail(rid):
         'status': 500,
         'message': '리뷰 삭제 실패',
         'rid': rid
+    }
+
+
+### Comment 관련 Response
+def CommentGetSuccess(data):
+    return {
+        'status': 200,
+        'message': '댓글 조회 성공',
+        'data': data
+    }
+
+def CommentCreateSuccess(data):
+    return {
+        'status': 201,
+        'message': '댓글 생성 성공',
+        'data': data
+    }
+
+def CommentCreateFail(err):
+    return {
+        'status': 400,
+        'message': '댓글 생성 실패',
+        'error_message': err
     }
