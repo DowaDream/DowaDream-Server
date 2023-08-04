@@ -6,10 +6,9 @@ def ReviewCreateSuccessed(data):
         'data': data
     }
 
-def ReviewCreateFailed(err):
+def ReviewFailed(err):
     return {
         'status': 400,
-        'message': '리뷰 생성 실패',
         'err_message': err
     }
 
@@ -46,7 +45,7 @@ def ReviewDetailGetSuccess(data):
 def ReviewPutSuccess(data):
     return {
         'status': 200,
-        'message': '리뷰 Detail 조회 성공',
+        'message': '리뷰 수정 성공',
         'data': data
     }
 

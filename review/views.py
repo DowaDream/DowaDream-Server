@@ -16,25 +16,15 @@ class ReviewList(APIView):
     @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
         try:
-            images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
-            if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
-                images = []
-            
-            if len(images) > 5:
-                response = JsonResponse(ReviewTooManyImages(), status=400)
-                raise Exception()
-            
-            review_serializer_data = save_review(request, images)
+            review_serializer_data = save_review(request)
             if isinstance(review_serializer_data, JsonResponse):
                 response = review_serializer_data
                 raise Exception()
             response = JsonResponse(ReviewCreateSuccessed(review_serializer_data), status=201)
-        
         except:
             transaction.set_rollback(True)
         finally:
             return response
-    
     
     def get(self, request):
         return
@@ -42,10 +32,23 @@ class ReviewList(APIView):
 
 class ReviewDetail(APIView):
     def get(self, request, rid):
-        return
+        review = get_object_or_404(Review, rid=rid)
+        serializer = ReviewSerializer(review)
+        return JsonResponse(ReviewDetailGetSuccess(serializer.data), status=200)
     
+    @transaction.atomic     # 오류 생기면 롤백
     def put(self, request, rid):
-        return
+        review = get_object_or_404(Review, rid=rid)
+        try:
+            review_serializer_data = put_review(request, review)
+            if isinstance(review_serializer_data, JsonResponse):
+                response = review_serializer_data
+                raise Exception()
+            response = JsonResponse(ReviewPutSuccess(review_serializer_data), status=200)
+        except:
+            transaction.set_rollback(True)
+        finally:
+            return response
 
     def delete(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
