@@ -12,48 +12,42 @@ from .service import *
 
 
 class ReviewList(APIView):
-    # @transaction.atomic     # 오류 생기면 롤백
+    @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
-        review_serializer = ReviewSerializer(data=request.data)
-        if not review_serializer.is_valid():
-            return JsonResponse(ReviewCreateFailed(review_serializer.errors), status=400)
+        try:
+            images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
+            if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
+                images = []
+            
+            if len(images) > 5:
+                response = JsonResponse(ReviewTooManyImages(), status=400)
+                raise Exception()
+            
+            review_serializer = ReviewSerializer(data=request.data)
+            if not review_serializer.is_valid():
+                response = JsonResponse(ReviewCreateFailed(review_serializer.errors), status=400)
+                raise Exception()
+            review_instance = review_serializer.save()
+            
+            s3_urls = []
+            for image in images:
+                image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
+                if not image_serializer.is_valid():
+                    response = JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
+                    raise Exception()
+                s3_url = save_image(image, review_instance.rid)
+                s3_urls.append(s3_url)
+                image_serializer.validated_data["image"] = s3_url
+                image_serializer.save()
+            
+            review_serializer_data = review_serializer.data
+            review_serializer_data["images"] = s3_urls
+            response = JsonResponse(ReviewCreateSuccessed(review_serializer_data), status=201)
         
-        # 모두 valid한 경우 저장
-        review_instance = review_serializer.save()
-        
-        images = request.data.getlist('images')
-        s3_urls = []
-        
-        for image in images:    # image 파일 validation 검사
-            image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
-            if not image_serializer.is_valid():
-                return JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
-            s3_url = save_image(image, review_instance.rid)
-            s3_urls.append(s3_url)
-            image_serializer.validated_data["image"] = s3_url
-            image_serializer.save()
-        
-        # for image in images:
-        #     try:
-        #         s3_url = save_image(image, review_instance.rid)
-        #         new_image = Image.objects.create(
-        #             image = s3_url,
-        #             review = review_instance
-        #         )
-        #     except:
-        #         response = JsonResponse(ReviewImageUploadError, status=500)
-        
-        # 모두 완료되면 commit
-        # if 400 <= response.status_code < 600:
-        #     transaction.set_rollback(True)
-        
-        # 이미지 URL을 가져와서 review_serializer.data에 추가합니다.
-        review_serializer_data = review_serializer.data
-        review_serializer_data["images"] = s3_urls
-        
-        response = JsonResponse(ReviewCreateSuccessed(review_serializer_data), status=201)
-        
-        return response
+        except:
+            transaction.set_rollback(True)
+        finally:
+            return response
     
     
     def get(self, request):
