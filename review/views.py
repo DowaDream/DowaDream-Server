@@ -12,6 +12,7 @@ from .response import *
 from .service import *
 
 
+# 나중에 로그인한 유저로 자동 writer 추가
 class ReviewList(APIView):
     @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
@@ -27,16 +28,31 @@ class ReviewList(APIView):
             return response
     
     def get(self, request):
-        return
+        try:
+            review_lists = []
+            reviews = Review.objects.all()
+            for review in reviews:
+                images = Image.objects.filter(review__rid=review.rid)
+                review_data = ReviewSerializer(review).data
+                review_data["images"] = [image.image.url for image in images]
+                review_lists.append(review_data)
+            
+            return JsonResponse(ReviewGetListSuccess(review_lists), status=200)
+        except:
+            return JsonResponse(ReviewGetListFail(), status=500)
 
 
 class ReviewDetail(APIView):
     def get(self, request, rid):
-        review = get_object_or_404(Review, rid=rid)
-        images = Image.objects.filter(review__rid=rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [{"image_id": image.image_id, "image": image.image.url} for image in images]
-        return JsonResponse(ReviewDetailGetSuccess(review_data), status=200)
+        try:
+            review = get_object_or_404(Review, rid=rid)
+            images = Image.objects.filter(review__rid=rid)
+            review_data = ReviewSerializer(review).data
+            review_data["images"] = [image.image.url for image in images]
+            return JsonResponse(ReviewDetailGetSuccess(review_data), status=200)
+        except:
+            return JsonResponse(ReviewDetailGetFail(), status=500)
+            
     
     @transaction.atomic     # 오류 생기면 롤백
     def put(self, request, rid):
@@ -53,6 +69,9 @@ class ReviewDetail(APIView):
             return response
 
     def delete(self, request, rid):
-        review = get_object_or_404(Review, rid=rid)
-        review.delete()
-        return JsonResponse(ReviewDeleteSuccess(rid), status=204)
+        try:
+            review = get_object_or_404(Review, rid=rid)
+            review.delete()
+            return JsonResponse(ReviewDeleteSuccess(rid), status=204)
+        except:
+            return JsonResponse(ReviewDeleteFail(rid), status=500)

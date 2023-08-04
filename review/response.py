@@ -31,6 +31,18 @@ def ReviewTooManyImages():
         'message': '이미지는 최대 5장까지 가능'
     }
 
+def ReviewGetListSuccess(data):
+    return {
+        'status': 200,
+        'message': '리뷰 리스트 조회 성공',
+        'data': data
+    }
+
+def ReviewGetListFail():
+    return {
+        'status': 500,
+        'message': '리뷰 리스트 조회 실패',
+    }
 
 
 
@@ -40,6 +52,12 @@ def ReviewDetailGetSuccess(data):
         'status': 200,
         'message': '리뷰 Detail 조회 성공',
         'data': data
+    }
+
+def ReviewDetailGetFail():
+    return {
+        'status': 500,
+        'message': '리뷰 Detail 조회 실패',
     }
 
 def ReviewPutSuccess(data):
@@ -53,5 +71,12 @@ def ReviewDeleteSuccess(rid):
     return {
         'status': 204,
         'message': '리뷰 삭제 성공',
+        'rid': rid
+    }
+
+def ReviewDeleteFail(rid):
+    return {
+        'status': 500,
+        'message': '리뷰 삭제 실패',
         'rid': rid
     }
