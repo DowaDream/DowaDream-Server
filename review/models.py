@@ -1,7 +1,6 @@
 from django.db import models
 from user.models import User
 
-# rid, content, images, writer, progrmRegistNo, category
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(verbose_name="작성 일시", auto_now_add=True)
@@ -21,7 +20,7 @@ class Review(BaseModel):
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
     image = models.ImageField(verbose_name="리뷰 이미지")
-    rid = models.IntegerField(verbose_name="리뷰 rid")
+    review = models.ForeignKey(to=Review, on_delete=models.CASCADE, blank=False)
 
     def __str__(self):
         return str(self.image)

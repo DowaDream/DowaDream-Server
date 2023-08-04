@@ -2,7 +2,7 @@ from config import settings
 import boto3
 
 
-def save_image(image):
+def save_image(image, rid):
     try:
         s3 = boto3.client('s3',
                           aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -13,7 +13,7 @@ def save_image(image):
         
         file_path = image.name
         s3.upload_fileobj(image, bucket_name, file_path)
-        s3_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{file_path}"
+        s3_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{rid}/{file_path}"
         return s3_url
         
     except:
