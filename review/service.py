@@ -1,5 +1,9 @@
 from config import settings
 import boto3
+from django.http import JsonResponse
+
+from .response import *
+from .serializers import *
 
 
 def save_image(image, rid):
@@ -18,3 +22,24 @@ def save_image(image, rid):
         
     except:
         return Exception("s3 이미지 업로드 실패")
+
+
+def save_review(request, images):
+    review_serializer = ReviewSerializer(data=request.data)
+    if not review_serializer.is_valid():
+        return JsonResponse(ReviewCreateFailed(review_serializer.errors), status=400)
+    review_instance = review_serializer.save()
+            
+    s3_urls = []
+    for image in images:
+        image_serializer = ImageSerializer(data={"image": image, "review":review_instance.rid})
+        if not image_serializer.is_valid():
+            return JsonResponse(ReviewImageFormatError(image_serializer.errors), status=400)
+        s3_url = save_image(image, review_instance.rid)
+        s3_urls.append(s3_url)
+        image_serializer.validated_data["image"] = s3_url
+        image_serializer.save()
+            
+    review_serializer_data = review_serializer.data
+    review_serializer_data["images"] = s3_urls
+    return review_serializer_data
