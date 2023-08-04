@@ -103,3 +103,24 @@ def CommentCreateFail(err):
         'message': '댓글 생성 실패',
         'error_message': err
     }
+
+def CommentDeleteSuccess(cid):
+    return {
+        'status': 204,
+        'message': '댓글 삭제 성공',
+        'rid': cid
+    }
+
+def CommentPutSuccess(data):
+    return {
+        'status': 200,
+        'message': '댓글 수정 성공',
+        'data': data
+    }
+
+def CommentPutFail(err):
+    return {
+        'status': 400,
+        'message': '댓글 수정 실패',
+        'error_message': err
+    }

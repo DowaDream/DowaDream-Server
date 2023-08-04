@@ -79,17 +79,36 @@ class ReviewDetail(APIView):
 
 
 ### Comment ###
-class ComentList(APIView):
+class CommentList(APIView):
     def get(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
-        comments = Comment.objects.filter(rid=review)
+        comments = Comment.objects.filter(review=review)
         serializer = CommentSerializer(comments, many=True)
         return JsonResponse(CommentGetSuccess(serializer.data), status=200)
 
     def post(self, request, rid):
-        request.data['rid'] = rid
+        request.data['review'] = rid
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(CommentCreateSuccess(serializer.data), status=201)
         return JsonResponse(CommentCreateFail(serializer.errors), status=400)
+
+
+class CommentDetail(APIView):
+    def put(self, request, rid, cid):
+        comment = get_object_or_404(Comment, cid=cid)
+        request.data['cid'] = comment.cid
+        request.data['writer'] = comment.writer.id
+        request.data['review'] = rid
+        
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(CommentPutSuccess(serializer.data), status=201)
+        return JsonResponse(CommentPutFail(serializer.errors), status=400)
+    
+    def delete(self, request, rid, cid):
+        comment = get_object_or_404(Comment, cid=cid)
+        comment.delete()
+        return JsonResponse(CommentDeleteSuccess(cid), status=204)

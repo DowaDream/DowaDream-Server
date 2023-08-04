@@ -29,4 +29,4 @@ class Comment(BaseModel):
     cid = models.AutoField(primary_key=True)
     writer = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False)
     content = models.TextField(verbose_name="댓글 텍스트", blank=False)
-    rid = models.ForeignKey(to=Review, on_delete=models.CASCADE, blank=False)
+    review = models.ForeignKey(to=Review, on_delete=models.CASCADE, blank=False)
