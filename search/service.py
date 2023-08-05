@@ -26,25 +26,19 @@ def callByKeyword(keyword, actPlace=None):
         # 게시물이 여러개일 때는 items가 list인데, 하나일 때는 dict이기 때문에 분기를 나누어 처리
         if type(items) is dict:
             temp = {}
-            title = items['progrmSj']
-            place = items['actPlace']
-            progrmRegistNo = items['progrmRegistNo']
+            temp['title'] = items['progrmSj']
+            temp['place'] = items['actPlace']
+            temp['progrmRegistNo'] = items['progrmRegistNo']
 
-            temp['title'] = title
-            temp['place'] = place
-            temp['progrmRegistNo'] = progrmRegistNo
             result.append(temp)
         # print(items)
         else:
             for item in items:
                 temp = {}
-                title = item.get('progrmSj')
-                place = item.get('actPlace')
-                progrmRegistNo = item.get('progrmRegistNo')
+                temp['title'] = item.get('progrmSj')
+                temp['place'] = item.get('actPlace')
+                temp['progrmRegistNo'] = item.get('progrmRegistNo')
 
-                temp['title'] = title
-                temp['place'] = place
-                temp['progrmRegistNo'] = progrmRegistNo
                 result.append(temp)
         # print(result)
         return result
@@ -72,6 +66,12 @@ def callByArea(keyword):
         if itemsList is None:
             return None
         items = itemsList['item']
+        if type(items) is dict:
+            temp = {}
+            temp['title'] = items['progrmSj']
+            temp['progrmRegistNo'] = items['progrmRegistNo']
+            result.append(temp)
+
         for item in items:
             temp = {}
             title = item.get('progrmSj')
@@ -111,10 +111,10 @@ def callByRegistNo(registNo):
         # 날짜와 시간 값 먼저 처리하기
         actStartDate = item.get('progrmBgnde')
         actStartTime = item.get('actBeginTm')
-        print(f"actStartDate: {actStartDate}, actStartTime: {actStartTime}")
+        # print(f"actStartDate: {actStartDate}, actStartTime: {actStartTime}")
         actEndDate = item.get('progrmEndde')
         actEndTime = item.get('actEndTm')
-        print(f"actEndDate: {actEndDate}, actEndTime: {actEndTime}")
+        # print(f"actEndDate: {actEndDate}, actEndTime: {actEndTime}")
         actStart = actStartDate[0:4] + '/' + actStartDate[4:6] + '/' + actStartDate[6:8] + '-' + actStartTime + ':00:00'
         actEnd = actEndDate[0:4] + '/' + actEndDate[4:6] + '/' + actEndDate[6:8] + '-' + actEndTime + ':00:00'
         tempRecruitStart = item.get('noticeBgnde')
