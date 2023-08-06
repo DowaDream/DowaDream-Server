@@ -35,3 +35,24 @@ jobs:
       - name: Run Tests
         run: |
           python manage.py test
+          
+  CD:
+    name: 'CD'
+    needs: CI
+    runs-on: ubuntu-latest
+    steps:
+    - name: Connect EC2
+      uses: appleboy/ssh-action@master
+      env:
+        ENV_FILE: ${{ secrets.ENV_FILE }}
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        command_timeout: 1m
+        port: 22
+        envs: ENV_FILE
+        script: |
+          echo "EC2 연결 성공"
+          sudo apt-get update
+          sudo apt-get -y upgrade
