@@ -81,7 +81,6 @@ pyparsing==3.1.0
 python-dateutil==2.8.2
 python3-openid==3.2.0
 pytz==2023.3
-pywin32==306
 pywin32-ctypes==0.2.2
 PyYAML==6.0.1
 pyzmq==25.1.0
@@ -95,10 +94,6 @@ stack-data==0.6.2
 tensorboard==2.13.0
 tensorboard-data-server==0.7.1
 tensorboard-plugin-wit==1.8.1
-tensorflow==2.13.0
-tensorflow-estimator==2.13.0
-tensorflow-intel==2.13.0
-tensorflow-io-gcs-filesystem==0.31.0
 termcolor==2.3.0
 tomli==2.0.1
 tomlkit==0.12.1
