@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 4   # 병렬 처리
       matrix:
-        python-version: [3.10]
+        python-version: ['3.10']
 
     steps:
     - uses: actions/checkout@v3   # @: github actions 라이브러리(v3) 사용
