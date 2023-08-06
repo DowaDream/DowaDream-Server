@@ -18,7 +18,9 @@ environ.Env.read_env(
 )
 SECRET_KEY = env('SECRET_KEY')
 # BASE_URL = "http://dowadream.kro.kr:8000/"
-BASE_URL = "http://localhost:8000/"
+# BASE_URL = "http://localhost:8000/"
+BASE_URL = "https://api.dowadream.site/"
+
 
 DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
@@ -28,6 +30,7 @@ AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_PASSWORD = env('GOOGLE_PASSWORD')
+VOL_API_KEY = env('VOL_API_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -119,6 +122,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+CSRF_TRUSTED_ORIGINS = ['https://api.dowadream.site']
 
 ROOT_URLCONF = "config.urls"
 
