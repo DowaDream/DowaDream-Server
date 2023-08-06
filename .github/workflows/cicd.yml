@@ -2,7 +2,7 @@ name: DowaDream CI/CD
 
 on: # action을 언제 실행할지 설정
   push:
-    branches: ["feat/#3-cicd"]
+    branches: ["main"]  # main 브랜치가 push될 때마다 github action이 실행됨
 
 jobs:
   CI:
@@ -14,11 +14,11 @@ jobs:
         python-version: ["3.10"]
 
     steps:
-      - uses: actions/checkout@v3 # @: github actions 라이브러리(v3) 사용
+      - uses: actions/checkout@v3 # 기본적으로 사용하는 github action 라이브러리
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
-        with:
+        with:  # 파이썬 버전 설정
           python-version: ${{ matrix.python-version }}
 
       - name: Install requirements.txt
@@ -36,19 +36,19 @@ jobs:
         run: |
           python manage.py test
           
-  CD:
+  CD:  # 배포
     name: 'CD'
-    needs: CI
+    needs: CI    # CI가 완료되면 CD 시작
     runs-on: ubuntu-latest
     steps:
     - name: Connect EC2
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@master  # EC2 SSH 연결을 도와주는 라이브러리
       env:
         ENV_FILE: ${{ secrets.ENV_FILE }}
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
+        host: ${{ secrets.HOST }}  # EC2 IP 주소
+        username: ${{ secrets.USERNAME }}  # EC2 username
+        key: ${{ secrets.KEY }}  # pem키
         command_timeout: 1m
         port: 22
         envs: ENV_FILE
@@ -69,4 +69,5 @@ jobs:
           sudo lsof -t -i tcp:8000 | xargs kill -9
           python manage.py migrate
           nohup python manage.py runserver 0.0.0.0:8000 > nohup.out 2> nohup.err < /dev/null &
+          echo "배포 성공"
           exit 0
