@@ -1,0 +1,37 @@
+name: DowaDream CI
+
+on: # action을 언제 실행할지 설정
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4   # 병렬 처리
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v3   # @: github actions 라이브러리(v3) 사용
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    # .env 파일 생성
+    - name: Generate env file
+      run: |
+        echo ${{ secrets.ENV_FILE }} >> .env
+        
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+    
+    - name: Run Tests
+      run: |
+        python manage.py test
