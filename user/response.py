@@ -20,6 +20,6 @@ def SignUpSuccess(data):
 
 def SignUpFailed(status):
     return {
-        'err_msg': '회원가입 성공',
+        'err_msg': '회원가입 실패',
         'status': status
     }
