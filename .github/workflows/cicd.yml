@@ -56,3 +56,14 @@ jobs:
           echo "EC2 연결 성공"
           sudo apt-get update
           sudo apt-get -y upgrade
+
+          cd /home/ubuntu/DowaDream-Server
+          source venv/bin/activate
+          git pull
+          echo "$ENV_FILE" >> .env
+          pip install -r requirements.txt
+
+          sudo lsof -t -i tcp:8000 | xargs kill -9
+          python manage.py migrate
+          nohup python manage.py runserver 0.0.0.0:8000 &
+          exit 0
