@@ -30,7 +30,7 @@ jobs:
         echo ${{ secrets.ENV_FILE }} >> .env
         
       env:
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        SECRET_KEY: ${{ secrets.ENV_FILE }}
     
     - name: Run Tests
       run: |
