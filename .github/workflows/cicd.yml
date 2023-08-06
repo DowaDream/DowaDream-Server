@@ -27,7 +27,7 @@ jobs:
     # .env 파일 생성
     - name: Generate env file
       run: |
-        echo ${{ secrets.ENV_FILE }} >> .env
+        echo "$secrets.ENV_FILE" >> .env
         
       env:
         SECRET_KEY: ${{ secrets.ENV_FILE }}
