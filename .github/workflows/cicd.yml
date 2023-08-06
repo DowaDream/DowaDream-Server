@@ -60,8 +60,11 @@ jobs:
           cd /home/ubuntu/DowaDream-Server
           source venv/bin/activate
           git pull
+          echo "git pull 성공"
+          
           echo "$ENV_FILE" >> .env
           pip install -r requirements.txt
+          echo "requirements.txt 설치 성공"
 
           sudo lsof -t -i tcp:8000 | xargs kill -9
           python manage.py migrate
