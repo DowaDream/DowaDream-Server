@@ -37,7 +37,7 @@ class ReviewList(APIView):
     
     @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
-        res = save_review(request, None)
+        res = post_review(request)
         if res.status >= 400:
             transaction.set_rollback(True)
         return responseFactory(res)
@@ -58,7 +58,8 @@ class ReviewDetail(APIView):
     def put(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review) # 인가 체크
-        res = save_review(request, review)
+        res = put_review(request, review)
+        
         if res.status >= 400:
             transaction.set_rollback(True)
         return responseFactory(res)

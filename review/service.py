@@ -1,14 +1,11 @@
-from config import settings
-import boto3
-from django.http import JsonResponse
-
 from .response import *
 from .serializers import *
+from .s3_manager import *
 
 
 ### 리뷰 관련 메소드
-# 리뷰 생성/수정 메소드
-def save_review(request, review) -> ResponseDto:
+# 리뷰 생성
+def post_review(request) -> ResponseDto:
     images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
     if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
         images = []
@@ -17,11 +14,7 @@ def save_review(request, review) -> ResponseDto:
     
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
-    
-    if review is None:
-        serializer = ReviewSerializer(data=mutable_data)    # post인 경우 새로운 review 생성
-    else:
-        serializer = ReviewSerializer(review, data=mutable_data) # put인 경우 기존의 review를 수정
+    serializer = ReviewSerializer(data=mutable_data)
     
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
@@ -33,10 +26,36 @@ def save_review(request, review) -> ResponseDto:
     
     data = serializer.data
     data["images"] = s3_urls
-    if review is None:
-        return ResponseDto(status=201, data=data, msg=message['ReviewCreateSuccess'])
-    else:
-        return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
+    return ResponseDto(status=201, data=data, msg=message['ReviewCreateSuccess'])
+
+
+# 리뷰 수정
+def put_review(request, review) -> ResponseDto:
+    images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
+    if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
+        images = []
+    elif len(images) > 5:
+        return ResponseDto(status=400, msg=message["TooManyImages"])
+    
+    mutable_data = request.data.copy()
+    mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
+    serializer = ReviewSerializer(review, data=mutable_data)
+    
+    if not serializer.is_valid():
+        return ResponseDto(status=400, msg=serializer.errors)
+    review_instance = serializer.save()     # review를 DB에 저장
+    
+    print(mutable_data['images'])
+    delete_image_s3(mutable_data['images'])
+    s3_urls = save_images_db(images, review_instance.rid)   # image를 DB에 저장
+    
+    if s3_urls is None:
+        return ResponseDto(status=400, msg=message['ImageFormatError'])
+    
+    data = serializer.data
+    data["images"] = s3_urls
+    return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
+
 
 
 # 리뷰 리스트 조회
@@ -63,24 +82,6 @@ def get_one_review(rid) -> ResponseDto:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
 
-
-def save_image_s3(image, rid):      # S3에 이미지 저장
-    try:
-        s3 = boto3.client('s3',
-                          aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                          region_name=settings.AWS_REGION)
-        bucket_name = settings.AWS_STORAGE_BUCKET_NAME
-        
-        file_path = image.name
-        s3.upload_fileobj(image, bucket_name, file_path)
-        s3_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{rid}/{file_path}"
-        return s3_url
-        
-    except:
-        print("s3 이미지 업로드 불가")
-        return None
-
 def save_images_db(images, rid):
     s3_urls = []
     for image in images:
@@ -97,7 +98,6 @@ def save_images_db(images, rid):
         image_serializer.validated_data["image"] = s3_url
         image_serializer.save()
     return s3_urls
-
 
 
 
