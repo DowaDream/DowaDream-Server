@@ -19,7 +19,7 @@ class ReviewList(APIView):
     @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
         try:
-            review_serializer_data = save_review(request)
+            review_serializer_data = save_review(request, None)
             if isinstance(review_serializer_data, JsonResponse):
                 response = review_serializer_data
                 raise Exception()
@@ -63,13 +63,14 @@ class ReviewDetail(APIView):
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review)
         try:
-            review_serializer_data = put_review(request, review)
+            review_serializer_data = save_review(request, review)
             if isinstance(review_serializer_data, JsonResponse):
                 response = review_serializer_data
                 raise Exception()
-            return JsonResponse(ReviewPutSuccess(review_serializer_data), status=200)
+            response = JsonResponse(ReviewPutSuccess(review_serializer_data), status=200)
         except:
             transaction.set_rollback(True)
+        finally:
             return response
 
 
