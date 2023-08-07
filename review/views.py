@@ -14,6 +14,8 @@ from .service import *
 
 # 나중에 로그인한 유저로 자동 writer 추가
 class ReviewList(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     @transaction.atomic     # 오류 생기면 롤백
     def post(self, request):
         try:
@@ -43,6 +45,8 @@ class ReviewList(APIView):
 
 
 class ReviewDetail(APIView):
+    permission_classes = [IsWriterOrReadOnly]
+    
     def get(self, request, rid):
         try:
             review = get_object_or_404(Review, rid=rid)
@@ -52,34 +56,35 @@ class ReviewDetail(APIView):
             return JsonResponse(ReviewDetailGetSuccess(review_data), status=200)
         except:
             return JsonResponse(ReviewDetailGetFail(), status=500)
-    
+
     
     @transaction.atomic     # 오류 생기면 롤백
     def put(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
+        self.check_object_permissions(self.request, review)
         try:
             review_serializer_data = put_review(request, review)
             if isinstance(review_serializer_data, JsonResponse):
                 response = review_serializer_data
                 raise Exception()
-            response = JsonResponse(ReviewPutSuccess(review_serializer_data), status=200)
+            return JsonResponse(ReviewPutSuccess(review_serializer_data), status=200)
         except:
             transaction.set_rollback(True)
-        finally:
             return response
 
+
     def delete(self, request, rid):
-        try:
-            review = get_object_or_404(Review, rid=rid)
-            review.delete()
-            return JsonResponse(ReviewDeleteSuccess(rid), status=204)
-        except:
-            return JsonResponse(ReviewDeleteFail(rid), status=500)
+        review = get_object_or_404(Review, rid=rid)
+        self.check_object_permissions(self.request, review)
+        review.delete()
+        return JsonResponse(ReviewDeleteSuccess(rid), status=204)
 
 
 
 ### Comment ###
 class CommentList(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     def get(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
         comments = Comment.objects.filter(review=review)
@@ -88,6 +93,7 @@ class CommentList(APIView):
 
     def post(self, request, rid):
         request.data['review'] = rid
+        request.data['writer'] = request.user.id    # 현재 로그인된 user
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -96,10 +102,14 @@ class CommentList(APIView):
 
 
 class CommentDetail(APIView):
+    permission_classes = [IsWriterOrReadOnly]
+    
     def put(self, request, rid, cid):
         comment = get_object_or_404(Comment, cid=cid)
+        self.check_object_permissions(self.request, comment)
+        
         request.data['cid'] = comment.cid
-        request.data['writer'] = comment.writer.id
+        request.data['writer'] = request.user.id    # 현재 로그인된 user
         request.data['review'] = rid
         
         serializer = CommentSerializer(comment, data=request.data)
@@ -110,5 +120,6 @@ class CommentDetail(APIView):
     
     def delete(self, request, rid, cid):
         comment = get_object_or_404(Comment, cid=cid)
+        self.check_object_permissions(self.request, comment)
         comment.delete()
         return JsonResponse(CommentDeleteSuccess(cid), status=204)

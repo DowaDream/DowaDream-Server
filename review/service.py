@@ -13,7 +13,11 @@ def save_review(request):
     elif len(images) > 5:
         return JsonResponse(ReviewTooManyImages(), status=400)
     
+    request.data['writer'] = request.user.id    # 현재 로그인된 user
     review_serializer = ReviewSerializer(data=request.data)
+    if not review_serializer.is_valid():
+        return JsonResponse(review_serializer.errors, status=400)
+    
     review_instance = save_review_instance(review_serializer)
     s3_urls = save_images_db(images, review_instance.rid)
     
@@ -28,7 +32,11 @@ def put_review(request, review):
     elif len(images) > 5:
         return JsonResponse(ReviewTooManyImages(), status=400)
     
+    request.data['writer'] = request.user.id    # 현재 로그인된 user
     review_serializer = ReviewSerializer(review, data=request.data) # 기존의 review를 수정
+    if not review_serializer.is_valid():
+        return JsonResponse(review_serializer.errors, status=400)
+    
     review_instance = save_review_instance(review_serializer)
     s3_urls = save_images_db(images, review_instance.rid)
     
