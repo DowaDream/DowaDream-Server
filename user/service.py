@@ -9,6 +9,7 @@ from json import JSONDecodeError
 BASE_URL = settings.BASE_URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
+
 def get_google_access_token(code):
     client_id = settings.GOOGLE_CLIENT_ID
     client_secret = settings.GOOGLE_PASSWORD
@@ -25,17 +26,19 @@ def get_google_access_token(code):
     return access_token
 
 
-def get_google_email(access_token):
-    # 가져온 access_token으로 이메일값을 구글에 요청
-    email_req = requests.get(f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
-    email_req_status = email_req.status_code
-    if email_req_status != 200:
-        return JsonResponse({'err_msg': 'failed to get email'}, status=400)
+### 구글 로그인 관련 ###
+def get_google_profile(access_token):
+    # 가져온 access_token으로 사용자 정보를 구글에 요청
+    profile_req = requests.get(f"https://www.googleapis.com/oauth2/v2/userinfo?access_token={access_token}")
+    profile_req_status = profile_req.status_code
+    if profile_req_status != 200:
+        return JsonResponse({'err_msg': 'failed to get profile'}, status=400)
     
-    # 성공 시 이메일 가져오기
-    email_req_json = email_req.json()
-    email = email_req_json.get('email')
-    return email
+    # 성공 시 프로필 정보 가져오기
+    profile_req_json = profile_req.json()
+    email = profile_req_json.get('email')
+    profile_picture = profile_req_json.get('picture')  # 프로필 사진 URL
+    return email, profile_picture
 
 
 # 로그인
@@ -52,7 +55,7 @@ def google_callback_signin(data, user, email) -> ResponseDto:
 
 
 # 회원가입
-def google_callback_signup(data, email) -> ResponseDto:
+def google_callback_signup(data, email, profile_img) -> ResponseDto:
     accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
     accept_status = accept.status_code
 
@@ -60,5 +63,11 @@ def google_callback_signup(data, email) -> ResponseDto:
         return ResponseDto(status=accept_status, msg=message['SignUpFail'])
 
     user = User.objects.get(email=email)
+    user.profile_img = profile_img  # profile_img 저장
+    user.save()  # 변경 내용을 저장
     data = make_token(email, accept, user)
     return ResponseDto(status=201, msg=message['SignUpSuccess'], data=data)
+
+
+
+### 유저 관련 ###

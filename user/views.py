@@ -1,10 +1,11 @@
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http import JsonResponse
-from .response import *
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .service import *
 from .models import *
@@ -33,7 +34,7 @@ def google_login(request):
 def google_callback(request):
     code = request.GET.get('code')
     access_token = get_google_access_token(code)
-    email = get_google_email(access_token)
+    email, profile_img = get_google_profile(access_token)
 
     try:
         user = User.objects.get(email=email)
