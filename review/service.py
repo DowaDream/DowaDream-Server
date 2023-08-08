@@ -3,6 +3,39 @@ from .serializers import *
 from .s3_manager import *
 
 
+### 이미지 관련 메소드
+def save_images_db(images, rid):
+    s3_urls = []
+    for image in images:
+        image_serializer = ImageSerializer(data={"image": image, "review":rid})
+        if not image_serializer.is_valid():
+            print("이미지 형식이 아님")
+            return None
+        
+        s3_url = save_image_s3(image, rid)
+        if s3_url is None:
+            return None
+        
+        s3_urls.append(s3_url)
+        image_serializer.validated_data["image"] = s3_url
+        image_serializer.save()
+    return s3_urls
+
+def delete_images_db(rid):
+    try:
+        review = Review.objects.get(rid=rid)
+        images = Image.objects.filter(review=review)
+        delete_image_s3(images)
+        images.delete()
+        return 204
+    except Review.DoesNotExist:
+        return 404
+    except Exception as e:
+        print("기존 이미지 삭제 에러 발생:", e)
+        return 500  # 삭제 실패 또는 예외 발생
+
+
+
 ### 리뷰 관련 메소드
 # 리뷰 생성
 def post_review(request) -> ResponseDto:
@@ -12,15 +45,16 @@ def post_review(request) -> ResponseDto:
     elif len(images) > 5:
         return ResponseDto(status=400, msg=message["TooManyImages"])
     
+    # Review serializer & save
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
     serializer = ReviewSerializer(data=mutable_data)
-    
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
     review_instance = serializer.save()     # review를 DB에 저장
-    s3_urls = save_images_db(images, review_instance.rid)   # image를 DB에 저장
     
+    # Image serializer & save
+    s3_urls = save_images_db(images, review_instance.rid)   # image를 DB에 저장
     if s3_urls is None:
         return ResponseDto(status=400, msg=message['ImageFormatError'])
     
@@ -37,25 +71,23 @@ def put_review(request, review) -> ResponseDto:
     elif len(images) > 5:
         return ResponseDto(status=400, msg=message["TooManyImages"])
     
+    # Review serializer & save
     mutable_data = request.data.copy()
-    mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
+    mutable_data['writer'] = request.user.id
     serializer = ReviewSerializer(review, data=mutable_data)
-    
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
-    review_instance = serializer.save()     # review를 DB에 저장
+    review_instance = serializer.save()
     
-    print(mutable_data['images'])
-    delete_image_s3(mutable_data['images'])
+    # Image serializer & save
+    delete_images_db(review.rid)    # 기존의 images 삭제
     s3_urls = save_images_db(images, review_instance.rid)   # image를 DB에 저장
-    
     if s3_urls is None:
         return ResponseDto(status=400, msg=message['ImageFormatError'])
     
     data = serializer.data
     data["images"] = s3_urls
     return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
-
 
 
 # 리뷰 리스트 조회
@@ -82,22 +114,15 @@ def get_one_review(rid) -> ResponseDto:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
 
-def save_images_db(images, rid):
-    s3_urls = []
-    for image in images:
-        image_serializer = ImageSerializer(data={"image": image, "review":rid})
-        if not image_serializer.is_valid():
-            print("이미지 형식이 아님")
-            return None
-        
-        s3_url = save_image_s3(image, rid)
-        if s3_url is None:
-            return None
-        
-        s3_urls.append(s3_url)
-        image_serializer.validated_data["image"] = s3_url
-        image_serializer.save()
-    return s3_urls
+# 리뷰 삭제
+def delete_review(rid):
+    res = delete_images_db(rid)
+    if res == 204:   # 삭제 성공
+        return ResponseDto(status=204, msg=message['ReviewDeleteSuccess'])
+    elif res == 404:
+        return ResponseDto(status=400, msg=message['ReviewNotFound'])
+    else:
+        return ResponseDto(status=500, msg=message['ReviewDeleteFailed'])
 
 
 

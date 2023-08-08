@@ -19,6 +19,7 @@ message = {
     "ReviewNotFound": "일치하는 리뷰 없음",
     
     "ReviewDeleteSuccess": "리뷰 삭제 성공",
+    "ReviewDeleteFailed": "리뷰 삭제 실패",
     
     
     # 댓글 관련

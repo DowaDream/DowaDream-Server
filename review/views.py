@@ -65,10 +65,8 @@ class ReviewDetail(APIView):
         return responseFactory(res)
 
     def delete(self, request, rid):
-        review = get_object_or_404(Review, rid=rid)
-        self.check_object_permissions(self.request, review)
-        review.delete()
-        return JsonResponse(status=204, data={"msg": message['ReviewDeleteSuccess']})
+        res = delete_review(rid)
+        return responseFactory(res)
 
 
 
