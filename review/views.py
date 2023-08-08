@@ -43,7 +43,12 @@ class ReviewList(APIView):
         return responseFactory(res)
     
     def get(self, request):
-        data = get_review_list()
+        progrmRegistNo = request.GET.get('progrmRegistNo')
+        print(progrmRegistNo, type(progrmRegistNo))
+        if progrmRegistNo is None:
+            data = get_review_list()
+        else:
+            data = get_review_list_in_progrm(progrmRegistNo)
         return responseFactory(data)
 
 

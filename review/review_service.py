@@ -66,6 +66,17 @@ def get_review_list() -> ResponseDto:
     return ResponseDto(status=200, data=review_list, msg=message['ReviewListGetSuccess'])
 
 
+def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
+    review_list = []
+    reviews = Review.objects.filter(progrmRegistNo=progrmRegistNo)
+    for review in reviews:
+        images = Image.objects.filter(review__rid=review.rid)
+        review_data = ReviewSerializer(review).data
+        review_data["images"] = [image.image.url for image in images]
+        review_list.append(review_data)
+    return ResponseDto(status=200, data=review_list, msg=message['ReviewListInProgramGetSuccess'])
+
+
 def get_one_review(rid) -> ResponseDto:
     try:
         review = Review.objects.get(rid=rid)
