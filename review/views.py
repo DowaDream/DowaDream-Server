@@ -31,7 +31,7 @@ def responseFactory(res: ResponseDto):
         )
 
 
-# 나중에 로그인한 유저로 자동 writer 추가
+### Review ###
 class ReviewList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     
@@ -65,7 +65,9 @@ class ReviewDetail(APIView):
         return responseFactory(res)
 
     def delete(self, request, rid):
-        res = delete_review(rid)
+        review = get_object_or_404(Review, rid=rid)
+        self.check_object_permissions(self.request, review)
+        res = delete_review(review)
         return responseFactory(res)
 
 

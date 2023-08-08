@@ -77,8 +77,9 @@ def get_one_review(rid) -> ResponseDto:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
 
-def delete_review(rid):
-    res = delete_images_db(rid)
+def delete_review(review):
+    res = delete_images_db(review.rid)
+    review.delete()
     if res == 204:   # 삭제 성공
         return ResponseDto(status=204, msg=message['ReviewDeleteSuccess'])
     elif res == 404:

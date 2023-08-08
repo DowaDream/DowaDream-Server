@@ -13,9 +13,14 @@ class BaseModel(models.Model):
 class Review(BaseModel):
     rid = models.AutoField(primary_key=True)
     writer = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False)
-    content = models.TextField(verbose_name="리뷰 텍스트")
-    progrmRegistNo = models.CharField(max_length=15, verbose_name="봉사 등록번호")  # 1266114
-    category = models.CharField(max_length=60, verbose_name="봉사 카테고리")    # 생활편의지원 > 이동지원
+    progrmRegistNo = models.CharField(max_length=20, verbose_name="봉사 등록번호")
+    
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    is_public = models.BooleanField(default=True)
+    category = models.CharField(max_length=60, verbose_name="봉사 태그")
+    region = models.CharField(max_length=30, verbose_name="봉사 지역")
+    actPlace = models.CharField(max_length=60, verbose_name="봉사 장소")
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
