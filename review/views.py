@@ -15,19 +15,11 @@ from .review_service import *
 
 def responseFactory(res: ResponseDto):
     if res.data is None:
-        return JsonResponse(
-            status=res.status,
-            data={
-                "msg": res.msg
-            }
-        )
+        return JsonResponse(status=res.status, data={ "msg": res.msg })
     else:
         return JsonResponse(
             status=res.status,
-            data={
-                "msg": res.msg,
-                "data": res.data
-            }
+            data={ "msg": res.msg, "data": res.data }
         )
 
 
@@ -44,7 +36,6 @@ class ReviewList(APIView):
     
     def get(self, request):
         progrmRegistNo = request.GET.get('progrmRegistNo')
-        print(progrmRegistNo, type(progrmRegistNo))
         if progrmRegistNo is None:
             data = get_review_list()
         else:

@@ -1,4 +1,3 @@
-from typing import Union
 
 class ResponseDto:
     def __init__(self, status, msg, data=None):

@@ -8,6 +8,17 @@ from allauth.socialaccount.providers.google import views as google_view
 
 from .service import *
 from .models import *
+from .response import *
+
+
+def responseFactory(res: ResponseDto):
+    if res.data is None:
+        return JsonResponse(status=res.status, data={ "msg": res.msg })
+    else:
+        return JsonResponse(
+            status=res.status,
+            data={ "msg": res.msg, "data": res.data }
+        )
 
 
 
@@ -29,13 +40,13 @@ def google_callback(request):
 
         # 이미 Google로 제대로 가입된 유저 => 로그인
         data = {'access_token': access_token, 'code': code}
-        response_body = google_callback_signin(data, user, email)
-        return JsonResponse(response_body, status=response_body['status'])
+        res = google_callback_signin(data, user, email)
+        return responseFactory(res)
 
     except User.DoesNotExist:   # 회원가입
         data = {'access_token': access_token, 'code': code}
-        response_body = google_callback_signup(data, email)
-        return JsonResponse(response_body, status=response_body['status'])
+        res = google_callback_signup(data, email)
+        return responseFactory(res)
 
 
 class GoogleLogin(SocialLoginView):
