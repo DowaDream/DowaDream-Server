@@ -46,7 +46,7 @@ def google_callback(request):
 
     except User.DoesNotExist:   # 회원가입
         data = {'access_token': access_token, 'code': code}
-        res = google_callback_signup(data, email)
+        res = google_callback_signup(data, email, profile_img)
         return responseFactory(res)
 
 
@@ -54,3 +54,32 @@ class GoogleLogin(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_username(request):
+    new_name = request.data.get('username')
+    if new_name:
+        user = request.user  # 현재 로그인된 사용자
+        user.username = new_name
+        user.save()
+        res = ResponseDto(status=200, msg=message['UsernamePutSuccess'])
+    else:
+        res = ResponseDto(status=400, msg=message['UsernameIsEmpty'])
+    return responseFactory(res)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_resol_msg(request):
+    resol_msg = request.data.get('resol_msg')
+    if resol_msg:
+        user = request.user
+        user.resol_msg = resol_msg
+        user.save()
+        res = ResponseDto(status=200, msg=message['ResolMsgPutSuccess'])
+    else:
+        res = ResponseDto(status=400, msg=message['ResolMsgIsEmpty'])
+    return responseFactory(res)
