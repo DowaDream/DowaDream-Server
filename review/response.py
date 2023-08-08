@@ -1,126 +1,32 @@
-### Review 생성 관련 Response
-def ReviewCreateSuccessed(data):
-    return {
-        'status': 201,
-        'message': '리뷰 생성 성공',
-        'data': data
-    }
+from typing import Union
 
-def ReviewFailed(err):
-    return {
-        'status': 400,
-        'err_message': err
-    }
-
-def ReviewImageFormatError(err):
-    return {
-        'status': 400,
-        'message': '이미지 파일 오류',
-        'err_message': err
-    }
-
-def ReviewImageUploadError():
-    return {
-        'status': 500,
-        'message': '이미지 s3 업로드 중 오류',
-    }
-
-def ReviewTooManyImages():
-    return {
-        'status': 400,
-        'message': '이미지는 최대 5장까지 가능'
-    }
-
-def ReviewGetListSuccess(data):
-    return {
-        'status': 200,
-        'message': '리뷰 리스트 조회 성공',
-        'data': data
-    }
-
-def ReviewGetListFail():
-    return {
-        'status': 500,
-        'message': '리뷰 리스트 조회 실패',
-    }
+class ResponseDto:
+    def __init__(self, status, msg, data=None):
+        self.status = status
+        self.data = data
+        self.msg = msg
 
 
-
-### Review Detail 관련 Response
-def ReviewDetailGetSuccess(data):
-    return {
-        'status': 200,
-        'message': '리뷰 Detail 조회 성공',
-        'data': data
-    }
-
-def ReviewDetailGetFail():
-    return {
-        'status': 500,
-        'message': '리뷰 Detail 조회 실패',
-    }
-
-def ReviewPutSuccess(data):
-    return {
-        'status': 200,
-        'message': '리뷰 수정 성공',
-        'data': data
-    }
-
-def ReviewDeleteSuccess(rid):
-    return {
-        'status': 204,
-        'message': '리뷰 삭제 성공',
-        'rid': rid
-    }
-
-def ReviewDeleteFail(rid):
-    return {
-        'status': 500,
-        'message': '리뷰 삭제 실패',
-        'rid': rid
-    }
-
-
-### Comment 관련 Response
-def CommentGetSuccess(data):
-    return {
-        'status': 200,
-        'message': '댓글 조회 성공',
-        'data': data
-    }
-
-def CommentCreateSuccess(data):
-    return {
-        'status': 201,
-        'message': '댓글 생성 성공',
-        'data': data
-    }
-
-def CommentCreateFail(err):
-    return {
-        'status': 400,
-        'message': '댓글 생성 실패',
-        'error_message': err
-    }
-
-def CommentDeleteSuccess(cid):
-    return {
-        'status': 204,
-        'message': '댓글 삭제 성공',
-        'rid': cid
-    }
-
-def CommentPutSuccess(data):
-    return {
-        'status': 200,
-        'message': '댓글 수정 성공',
-        'data': data
-    }
-
-def CommentPutFail(err):
-    return {
-        'status': 400,
-        'message': '댓글 수정 실패',
-        'error_message': err
-    }
+message = {
+    # 리뷰 관련
+    "TooManyImages": "이미지는 최대 5장까지 가능",
+    "ImageFormatError": "이미지 파일 저장 불가",
+    "ReviewCreateSuccess": "리뷰 생성 성공",
+    "ReviewPutSuccess": "리뷰 수정 성공",
+    
+    "ReviewListGetSuccess": "리뷰 리스트 조회 성공",
+    "ReviewGetSuccess": "단일 리뷰 조회 성공",
+    "ReviewNotFound": "일치하는 리뷰 없음",
+    
+    "ReviewDeleteSuccess": "리뷰 삭제 성공",
+    
+    
+    # 댓글 관련
+    "CommentGetSuccess": "댓글 조회 성공",
+    "CommentCreateSuccess": "댓글 생성 성공",
+    "CommentPutSuccess": "댓글 수정 성공",
+    "CommentDeleteSuccess": "댓글 삭제 성공",
+    
+    "InvalidFormat": "올바르지 않은 형식",
+    
+}
