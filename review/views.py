@@ -8,9 +8,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from .models import *
-from .serializers import *
 from .response import *
-from .service import *
+from .comment_service import *
+from .review_service import *
 
 
 def responseFactory(res: ResponseDto):
