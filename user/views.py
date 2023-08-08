@@ -83,3 +83,13 @@ def update_resol_msg(request):
     else:
         res = ResponseDto(status=400, msg=message['ResolMsgIsEmpty'])
     return responseFactory(res)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def inc_fighting(request):
+    user = request.user
+    user.fighting += 1
+    user.save()
+    res = ResponseDto(status=200, msg=message['IncreasedFighting'])
+    return responseFactory(res)

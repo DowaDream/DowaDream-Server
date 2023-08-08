@@ -17,5 +17,6 @@ message = {
     "UsernameIsEmpty": "유저네임이 비었음",
     "ResolMsgPutSuccess": "다짐 메세지 수정 성공",
     "ResolMsgIsEmpty": "다짐 메세지가 비었음",
+    "IncreasedFighting": "파이팅 점수 1점 증가",
     
 }

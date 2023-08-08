@@ -8,4 +8,5 @@ urlpatterns = [
     
     path('resol/', update_resol_msg),
     path('username/', update_username),
+    path('fighting/', inc_fighting),
 ]
