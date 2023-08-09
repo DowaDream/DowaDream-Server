@@ -8,9 +8,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from .models import *
-from .serializers import *
 from .response import *
-from .service import *
+from .comment_service import *
+from .review_service import *
 
 
 def responseFactory(res: ResponseDto):
@@ -31,7 +31,7 @@ def responseFactory(res: ResponseDto):
         )
 
 
-# 나중에 로그인한 유저로 자동 writer 추가
+### Review ###
 class ReviewList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     
@@ -43,7 +43,12 @@ class ReviewList(APIView):
         return responseFactory(res)
     
     def get(self, request):
-        data = get_review_list()
+        progrmRegistNo = request.GET.get('progrmRegistNo')
+        print(progrmRegistNo, type(progrmRegistNo))
+        if progrmRegistNo is None:
+            data = get_review_list()
+        else:
+            data = get_review_list_in_progrm(progrmRegistNo)
         return responseFactory(data)
 
 
@@ -67,8 +72,8 @@ class ReviewDetail(APIView):
     def delete(self, request, rid):
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review)
-        review.delete()
-        return JsonResponse(status=204, data={"msg": message['ReviewDeleteSuccess']})
+        res = delete_review(review)
+        return responseFactory(res)
 
 
 

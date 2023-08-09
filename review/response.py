@@ -14,11 +14,13 @@ message = {
     "ReviewCreateSuccess": "리뷰 생성 성공",
     "ReviewPutSuccess": "리뷰 수정 성공",
     
-    "ReviewListGetSuccess": "리뷰 리스트 조회 성공",
+    "ReviewListGetSuccess": "전체 리뷰 리스트 조회 성공",
+    "ReviewListInProgramGetSuccess": "특정 봉사의 리뷰 리스트 조회 성공",
     "ReviewGetSuccess": "단일 리뷰 조회 성공",
     "ReviewNotFound": "일치하는 리뷰 없음",
     
     "ReviewDeleteSuccess": "리뷰 삭제 성공",
+    "ReviewDeleteFailed": "리뷰 삭제 실패",
     
     
     # 댓글 관련
