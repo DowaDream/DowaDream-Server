@@ -63,7 +63,7 @@ def get_review_list() -> ResponseDto:
         review_data = ReviewSerializer(review).data
         review_data["images"] = [image.image.url for image in images]
         review_list.append(review_data)
-    return ResponseDto(status=200, data=review_list, msg=message['ReviewListGetSuccess'])
+    return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
