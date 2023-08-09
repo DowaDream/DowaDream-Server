@@ -6,7 +6,7 @@ urlpatterns = [
     path('callback/', google_callback, name='google_callback'),
     path('login/finish/', GoogleLogin.as_view(), name='google_login_todjango'),
     
-    path('resol/', update_resol_msg),
-    path('username/', update_username),
-    path('fighting/', inc_fighting),
+    path('resol/', ResolMsgView.as_view()),
+    path('username/', UsernameView.as_view()),
+    path('fighting/', FightingView.as_view()),
 ]

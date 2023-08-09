@@ -71,3 +71,27 @@ def google_callback_signup(data, email, profile_img) -> ResponseDto:
 
 
 ### 유저 관련 ###
+def update_username(request):
+    new_name = request.data.get('username')
+    if new_name:
+        user = request.user  # 현재 로그인된 사용자
+        user.username = new_name
+        user.save()
+        return ResponseDto(status=200, msg=message['UsernamePutSuccess'])
+    else:
+        return ResponseDto(status=400, msg=message['UsernameIsEmpty'])
+
+def update_resol_msg(request) -> ResponseDto:
+    resol_msg = request.data.get('resol_msg')
+    if resol_msg:
+        user = request.user
+        user.resol_msg = resol_msg
+        user.save()
+        return ResponseDto(status=200, msg=message['ResolMsgPutSuccess'])
+    else:
+        return ResponseDto(status=400, msg=message['ResolMsgIsEmpty'])
+
+def inc_fighting(user) -> ResponseDto:
+    user.fighting += 1
+    user.save()
+    return ResponseDto(status=200, msg=message['IncreasedFighting'])

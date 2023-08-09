@@ -6,6 +6,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 from .service import *
 from .models import *
@@ -56,40 +57,27 @@ class GoogleLogin(SocialLoginView):
     client_class = OAuth2Client
 
 
+### 유저 관련
+class UsernameView(APIView):
+    permission_classes = [IsAuthenticated]
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_username(request):
-    new_name = request.data.get('username')
-    if new_name:
-        user = request.user  # 현재 로그인된 사용자
-        user.username = new_name
-        user.save()
-        res = ResponseDto(status=200, msg=message['UsernamePutSuccess'])
-    else:
-        res = ResponseDto(status=400, msg=message['UsernameIsEmpty'])
-    return responseFactory(res)
+    def put(self, request):
+        res = update_username(request)
+        return responseFactory(res)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_resol_msg(request):
-    resol_msg = request.data.get('resol_msg')
-    if resol_msg:
+class ResolMsgView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request):
+        res = update_resol_msg(request)
+        return responseFactory(res)
+
+
+class FightingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
         user = request.user
-        user.resol_msg = resol_msg
-        user.save()
-        res = ResponseDto(status=200, msg=message['ResolMsgPutSuccess'])
-    else:
-        res = ResponseDto(status=400, msg=message['ResolMsgIsEmpty'])
-    return responseFactory(res)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def inc_fighting(request):
-    user = request.user
-    user.fighting += 1
-    user.save()
-    res = ResponseDto(status=200, msg=message['IncreasedFighting'])
-    return responseFactory(res)
+        res = inc_fighting(user)
+        return responseFactory(res)
