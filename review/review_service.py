@@ -55,7 +55,7 @@ def put_review(request, review) -> ResponseDto:
     return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
 
 
-def get_review_list() -> ResponseDto:
+def get_all_review_list() -> ResponseDto:
     review_list = []
     reviews = Review.objects.all()
     for review in reviews:
@@ -64,6 +64,12 @@ def get_review_list() -> ResponseDto:
         review_data["images"] = [image.image.url for image in images]
         review_list.append(review_data)
     return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
+
+
+def get_user_review_list(user) -> ResponseDto:
+    reviews = Review.objects.filter(writer=user)  # 해당 유저가 쓴 리뷰들 가져오기
+    serializer = ReviewSerializer(reviews, many=True)  # Review 객체들을 직렬화
+    return ResponseDto(status=200, data=serializer.data, msg=message['UserReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:

@@ -31,14 +31,12 @@ def responseFactory(res: ResponseDto):
 
 
 ### Review ###
-# (사용자, 봉사 관계없이) 모든 리뷰를 반환
+# 로그인한 사용자의 리뷰 리스트 반환
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_reviews(request):
     user = request.user  # 로그인한 사용자 정보 가져오기
-    reviews = Review.objects.filter(writer=user)  # 해당 유저가 쓴 리뷰들 가져오기
-    serializer = ReviewSerializer(reviews, many=True)  # Review 객체들을 직렬화
-    res = ResponseDto(status=200, data=serializer.data, msg=message['UserReviewListGetSuccess'])
+    res = get_user_review_list(user)
     return responseFactory(res)
 
 
@@ -55,7 +53,7 @@ class UserReviewList(APIView):
     def get(self, request):
         progrmRegistNo = request.GET.get('progrmRegistNo')
         if progrmRegistNo is None:
-            data = get_review_list()
+            data = get_all_review_list()
         else:
             data = get_review_list_in_progrm(progrmRegistNo)
         return responseFactory(data)
