@@ -1,11 +1,10 @@
-from django.shortcuts import render
-from requests import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from config.permissions import IsWriterOrReadOnly
 from django.http import JsonResponse
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, permission_classes
 
 from .models import *
 from .response import *
@@ -32,7 +31,16 @@ def responseFactory(res: ResponseDto):
 
 
 ### Review ###
-class ReviewList(APIView):
+# 로그인한 사용자의 리뷰 리스트 반환
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_reviews(request):
+    user = request.user  # 로그인한 사용자 정보 가져오기
+    res = get_user_review_list(user)
+    return responseFactory(res)
+
+
+class UserReviewList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     
     @transaction.atomic     # 오류 생기면 롤백
@@ -44,15 +52,14 @@ class ReviewList(APIView):
     
     def get(self, request):
         progrmRegistNo = request.GET.get('progrmRegistNo')
-        print(progrmRegistNo, type(progrmRegistNo))
         if progrmRegistNo is None:
-            data = get_review_list()
+            data = get_all_review_list()
         else:
             data = get_review_list_in_progrm(progrmRegistNo)
         return responseFactory(data)
 
 
-class ReviewDetail(APIView):
+class UserReviewDetail(APIView):
     permission_classes = [IsWriterOrReadOnly]
     
     def get(self, request, rid):
