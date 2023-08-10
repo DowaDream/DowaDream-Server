@@ -21,12 +21,12 @@ def post_progrm_interact(data, user) -> ResponseDto:
     # request body에서 해당 필드의 값을 가져오고, 필드 값이 없으면 기존값을 넣음
     reviewed = data.get('reviewed', interact.reviewed)
     participated = data.get('participated', interact.participated)
-    cheered = data.get('cheered', interact.cheered)
+    clipped = data.get('clipped', interact.clipped)
     
     # 필드 값 설정
     interact.reviewed = reviewed
     interact.participated = participated
-    interact.cheered = cheered
+    interact.clipped = clipped
     interact.user = user
     
     serializer = PrgmInteractSerializer(interact, data=data)
@@ -39,5 +39,5 @@ def post_progrm_interact(data, user) -> ResponseDto:
 
 def get_interactions_list(user, field_name):
     interactions = Program_Interaction.objects.filter(user=user, **{field_name: True})
-    interations_list = list(interactions.values_list('progrmRegistNo', flat=True))
+    interations_list = list(interactions.values_list('progrmRegistNo', flat=True))  # flat=False: value 하나를 list로 저장
     return interations_list

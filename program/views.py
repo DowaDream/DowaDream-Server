@@ -21,7 +21,7 @@ class PrgmInteractUpdateView(APIView):
     permission_classes = [IsAuthenticated]
     
     ### put 메소드: Swagger 주석 꼭 필요함 ###
-    # reviewed, participated, cheered 필드 필수 아님!
+    # clipped, participated, cheered 필드 필수 아님!
     def put(self, request):
         request.data['user'] = request.user.id
         res = post_progrm_interact(request.data, request.user)
@@ -34,7 +34,7 @@ class CheeredGetView(APIView):
     def get(self, request):
         user = request.user
         interations_list = get_interactions_list(user, 'cheered')
-        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        res = ResponseDto(status=200, data=interations_list, msg=message["CheeredGetSuccess"])
         return responseFactory(res)
 
 
@@ -44,15 +44,15 @@ class ParticipatedGetView(APIView):
     def get(self, request):
         user = request.user
         interations_list = get_interactions_list(user, 'participated')
-        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        res = ResponseDto(status=200, data=interations_list, msg=message["ParticipatedGetSuccess"])
         return responseFactory(res)
 
 
-class ReviewedGetView(APIView):
+class ClippedGetView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
         user = request.user
-        interations_list = get_interactions_list(user, 'reviewed')
-        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        interations_list = get_interactions_list(user, 'clipped')
+        res = ResponseDto(status=200, data=interations_list, msg=message["ClippedGetSuccess"])
         return responseFactory(res)

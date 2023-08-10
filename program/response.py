@@ -9,4 +9,9 @@ class ResponseDto:
 message = {
     "PrgmInteractSuccess": "봉사내역/스크랩/응원하기 상태 업데이트 성공",
     "PrgmInteractFail": "봉사내역/스크랩/응원하기 상태 업데이트 실패",
+    
+    "CheeredGetSuccess": "응원한 봉사 리스트 조회 성공",
+    "ParticipatedGetSuccess": "참여한 봉사 리스트 조회 성공",
+    "ClippedGetSuccess": "스크랩한 봉사 리스트 조회 성공",
+    
 }

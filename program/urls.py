@@ -6,5 +6,5 @@ urlpatterns = [
     
     path('cheered/', CheeredGetView.as_view()),
     path('participated/', ParticipatedGetView.as_view()),
-    path('reviewed/', ReviewedGetView.as_view()),
+    path('clipped/', ClippedGetView.as_view()),
 ]

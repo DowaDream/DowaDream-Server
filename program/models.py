@@ -20,4 +20,4 @@ class Program_Interaction(BaseModel):
     progrmRegistNo = models.CharField(max_length=20, verbose_name="봉사 등록번호")
     cheered = models.BooleanField(choices=CHOICES, default=False)
     participated = models.BooleanField(choices=CHOICES, default=False)
-    reviewed = models.BooleanField(choices=CHOICES, default=False)
+    clipped = models.BooleanField(choices=CHOICES, default=False)
