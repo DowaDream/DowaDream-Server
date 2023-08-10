@@ -9,5 +9,6 @@ urlpatterns = [
     path('user/', include('dj_rest_auth.urls')),
     path('user/', include('allauth.urls')),
     
-    path('review/', include('review.urls'))
+    path('review/', include('review.urls')),
+    path('program/', include('program.urls'))
 ]
