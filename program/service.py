@@ -35,3 +35,9 @@ def post_progrm_interact(data, user) -> ResponseDto:
         return ResponseDto(status=200, data=serializer.data, msg=message['PrgmInteractSuccess'])
     
     return ResponseDto(status=400, data=serializer.errors, msg=message['PrgmInteractFail'])
+
+
+def get_interactions_list(user, field_name):
+    interactions = Program_Interaction.objects.filter(user=user, **{field_name: True})
+    interations_list = list(interactions.values_list('progrmRegistNo', flat=True))
+    return interations_list

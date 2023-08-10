@@ -26,3 +26,33 @@ class PrgmInteractUpdateView(APIView):
         request.data['user'] = request.user.id
         res = post_progrm_interact(request.data, request.user)
         return responseFactory(res)
+
+
+class CheeredGetView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        interations_list = get_interactions_list(user, 'cheered')
+        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        return responseFactory(res)
+
+
+class ParticipatedGetView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        interations_list = get_interactions_list(user, 'participated')
+        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        return responseFactory(res)
+
+
+class ReviewedGetView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        interations_list = get_interactions_list(user, 'reviewed')
+        res = ResponseDto(status=200, data=interations_list, msg="성공")
+        return responseFactory(res)
