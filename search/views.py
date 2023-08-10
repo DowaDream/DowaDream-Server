@@ -14,7 +14,7 @@ from .response import *
 from search.service import *
 
 class SearchKeywordView(APIView):
-    @swagger_auto_schema(query_serializer=SearchKeywordSerializer, responses={"200":ResponseSerializer, "404":ResponseSerializer})
+    @swagger_auto_schema(query_serializer=SearchKeywordSerializer, responses={"200":KeywordResponseSerializer, "404":KeywordResponseSerializer})
     def get(self, request):
         keyword = request.query_params.get('keyword')
         actPlace = request.query_params.get('actPlace')
@@ -26,7 +26,7 @@ class SearchKeywordView(APIView):
 
 
 class SearchAreaView(APIView):
-    @swagger_auto_schema(query_serializer=SearchAreaSerializer, responses={"200":ResponseSerializer, "404":ResponseSerializer})
+    @swagger_auto_schema(query_serializer=SearchAreaSerializer, responses={"200":AreaResponseSerializer, "404":AreaResponseSerializer})
     def get(self, request):
         keyword = request.query_params.get('keyword')
         search_result = callByArea(keyword)
@@ -37,7 +37,7 @@ class SearchAreaView(APIView):
 
 
 class SearchRegistNoView(APIView):
-    @swagger_auto_schema(query_serializer=SearchRegistNoSerializer, responses={"200":ResponseSerializer, "404":ResponseSerializer})
+    @swagger_auto_schema(query_serializer=SearchRegistNoSerializer, responses={"200":RegistNoResponseSerializer, "404":RegistNoResponseSerializer})
     def get(self, request):
         keyword = request.query_params.get('keyword')
         search_result = callByRegistNo(keyword)

@@ -11,10 +11,45 @@ class SearchAreaSerializer(serializers.Serializer):
 class SearchRegistNoSerializer(serializers.Serializer):
     keyword = serializers.CharField(required=True)
     
-class ResponseSerializer(serializers.Serializer):
+class KeywordDictSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    place = serializers.CharField()
+    progrmRegistNo = serializers.CharField()
+
+class KeywordResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
     message = serializers.CharField()
-    data = serializers.ListField(child=serializers.DictField())
+    data = KeywordDictSerializer(many=True)
+
+class AreaDictSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    progrmRegistNo = serializers.CharField()
+
+class AreaResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    message = serializers.CharField()
+    data = AreaDictSerializer(many=True)
+
+class RegistNoDictSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    recruitStatusNm = serializers.CharField()
+    actStart = serializers.CharField()
+    actEnd = serializers.CharField()
+    place = serializers.CharField()
+    adultAble = serializers.CharField()
+    teenAble = serializers.CharField()
+    recruitStart = serializers.CharField()
+    recruitEnd = serializers.CharField()
+    recruitInstitute = serializers.CharField()
+    registerInstitute = serializers.CharField()
+    maxPerson = serializers.CharField()
+    content = serializers.CharField()
+    progrmRegistNo = serializers.CharField()
+
+class RegistNoResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    message = serializers.CharField()
+    data = RegistNoDictSerializer(many=True)
 
 
 # class KeywordQuerySerializer(serializers.Serializer):
