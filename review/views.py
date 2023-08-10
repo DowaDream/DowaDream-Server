@@ -14,19 +14,11 @@ from .review_service import *
 
 def responseFactory(res: ResponseDto):
     if res.data is None:
-        return JsonResponse(
-            status=res.status,
-            data={
-                "msg": res.msg
-            }
-        )
+        return JsonResponse(status=res.status, data={ "msg": res.msg })
     else:
         return JsonResponse(
             status=res.status,
-            data={
-                "msg": res.msg,
-                "data": res.data
-            }
+            data={ "msg": res.msg, "data": res.data }
         )
 
 

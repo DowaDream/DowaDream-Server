@@ -1,25 +1,22 @@
-def SignInSuccessed(data):
-    return {
-        'status': 200,
-        'message': '로그인 성공',
-        'data': data
-    }
 
-def SignInFailed(status):
-    return {
-        'err_msg': '로그인 실패',
-        'status': status
-    }
+class ResponseDto:
+    def __init__(self, status, msg, data=None):
+        self.status = status
+        self.data = data
+        self.msg = msg
 
-def SignUpSuccess(data):
-    return {
-        'status': 201,
-        'message': '회원가입 성공',
-        'data': data
-    }
 
-def SignUpFailed(status):
-    return {
-        'err_msg': '회원가입 실패',
-        'status': status
-    }
+message = {
+    # 로그인/회원가입 관련
+    "SignInSuccess": "로그인 성공",
+    "SignInFail": "로그인 실패",
+    "SignUpSuccess": "회원가입 성공",
+    "SignUpFail": "회원가입 실패",
+    
+    "UsernamePutSuccess": "유저네임 수정 성공",
+    "UsernameIsEmpty": "유저네임이 비었음",
+    "ResolMsgPutSuccess": "다짐 메세지 수정 성공",
+    "ResolMsgIsEmpty": "다짐 메세지가 비었음",
+    "IncreasedFighting": "파이팅 점수 1점 증가",
+    
+}
