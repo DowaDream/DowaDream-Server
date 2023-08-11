@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Review, Image, Comment
+from .models import *
 
 # 유효한 이미지 파일인지 검사
 def is_image(image):
@@ -37,5 +37,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CheeredReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = Cheered_Review
         fields = "__all__"

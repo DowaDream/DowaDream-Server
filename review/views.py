@@ -106,14 +106,14 @@ class CommentDetail(APIView):
         return JsonResponse(status=204, data={'msg': message['CommentDeleteSuccess']})
 
 
-### 리뷰 응원하기
+### 리뷰 응원하기 ###
 class ReviewCheerGetView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
         cheered_reviews = Cheered_Review.objects.filter(writer=request.user)
-        serializer = CheeredReviewSerializer(cheered_reviews, many=True)
-        res = ResponseDto(status=200, data=serializer.data, msg=message["CheeredReviewListGetSuccess"])
+        review_id_list = list(cheered_reviews.values_list('review', flat=True))
+        res = ResponseDto(status=200, data=review_id_list, msg=message["CheeredReviewListGetSuccess"])
         return responseFactory(res)
 
 
