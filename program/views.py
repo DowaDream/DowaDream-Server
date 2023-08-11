@@ -24,7 +24,7 @@ class PrgmInteractUpdateView(APIView):
     # clipped, participated, cheered 필드 필수 아님!
     def put(self, request):
         request.data['user'] = request.user.id
-        res = post_progrm_interact(request.data, request.user)
+        res = update_progrm_interact(request.data, request.user)
         return responseFactory(res)
 
 

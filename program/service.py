@@ -8,7 +8,7 @@ from .models import *
 from .serializers import *
 
 
-def post_progrm_interact(data, user) -> ResponseDto:
+def update_progrm_interact(data, user) -> ResponseDto:
     progrmRegistNo = data.get('progrmRegistNo')
     
     try:
