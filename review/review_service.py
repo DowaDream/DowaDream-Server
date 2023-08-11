@@ -104,3 +104,29 @@ def delete_review(review):
     else:
         return ResponseDto(status=500, msg=message['ReviewDeleteFailed'])
 
+
+### 리뷰 응원하기
+def cheer_review(user, rid):
+    try:
+        review = Review.objects.get(rid=rid)
+    except Review.DoesNotExist:
+        return ResponseDto(status=400, msg=message['ReviewNotFound'])
+        
+    cheer, is_created = Cheered_Review.objects.get_or_create(writer=user, review=review)
+    if is_created:
+        return ResponseDto(status=201, msg=message['CheerReviewSuccess'])
+    else:
+        return ResponseDto(status=400, msg=message['AlreadyCheered'])
+
+def cancel_cheering_review(user, rid):
+    try:
+        review = Review.objects.get(rid=rid)
+    except Review.DoesNotExist:
+        return ResponseDto(status=400, msg=message['ReviewNotFound'])
+        
+    try:
+        cheered_review = Cheered_Review.objects.get(writer=user, review=review)
+        cheered_review.delete()
+        return ResponseDto(status=204, msg=message['CancelCheeringSuccess'])
+    except Cheered_Review.DoesNotExist:
+        return ResponseDto(status=400, msg=message['CancelCheeringFail'])
