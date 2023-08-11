@@ -19,12 +19,12 @@ def post_progrm_interact(data, user) -> ResponseDto:
         interact = Program_Interaction(progrmRegistNo=progrmRegistNo, user=user)
     
     # request body에서 해당 필드의 값을 가져오고, 필드 값이 없으면 기존값을 넣음
-    reviewed = data.get('reviewed', interact.reviewed)
+    cheered = data.get('cheered', interact.cheered)
     participated = data.get('participated', interact.participated)
     clipped = data.get('clipped', interact.clipped)
     
     # 필드 값 설정
-    interact.reviewed = reviewed
+    interact.cheered = cheered
     interact.participated = participated
     interact.clipped = clipped
     interact.user = user
