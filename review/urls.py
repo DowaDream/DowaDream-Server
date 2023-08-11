@@ -8,5 +8,5 @@ urlpatterns = [
     path('<int:rid>/comment/', CommentList.as_view()),
     path('<int:rid>/comment/<int:cid>/', CommentDetail.as_view()),
     
-    path('user/', get_user_reviews),
+    path('user/', AuthenticatedUserGetList.as_view()),
 ]

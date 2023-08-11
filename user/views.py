@@ -7,6 +7,8 @@ from allauth.socialaccount.providers.google import views as google_view
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+
 
 from .service import *
 from .models import *

@@ -34,3 +34,10 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = "__all__"
+
+
+### Swagger를 위한 Serializer
+class ReviewSwaggerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        exclude = ('rid', 'writer')
