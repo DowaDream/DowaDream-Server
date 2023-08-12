@@ -31,6 +31,7 @@ AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_PASSWORD = env('GOOGLE_PASSWORD')
 VOL_API_KEY = env('VOL_API_KEY')
+MAIL_ADDRESS = env('MAIL_ADDRESS')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -56,10 +57,12 @@ DJANGO_APPS = [
 PROJECT_APPS = [
     'user',
     'review',
-    'program'
+    'program',
+    'search'
 ]
 
 THIRD_PARTY_APPS = [
+    'rest_framework',
     "corsheaders",
     "storages",     # s3 storage
     'rest_framework_simplejwt',
@@ -73,6 +76,9 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    # swagger - API Documentation
+    'drf_yasg',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS

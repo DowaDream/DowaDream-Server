@@ -28,6 +28,7 @@ django-storages==1.13.2
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 docutils==0.16
+drf_yasg==1.21.7
 entrypoints==0.4
 executing==1.2.0
 flatbuffers==23.5.26

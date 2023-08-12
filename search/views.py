@@ -1,58 +1,47 @@
+import json
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.http import HttpResponse
-from django.http import JsonResponse
-
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.http import HttpResponse, JsonResponse
+from rest_framework import serializers
+from .serializers import *
+from .response import *
 
 from search.service import *
 
-def responseFactory(result):
-    if result is None:
-        return '404', 'Not Found'
-    else:
-        return '200', 'OK'
-
-@api_view(['POST'])
-def search_keyword(request): # return as json
-
-    keyword = request.data.get('keyword')
-    actPlace = request.data.get('actPlace')
-    search_result = callByKeyword(keyword, actPlace)
-    code, msg = responseFactory(search_result)
-    result = {
-        'status': code,
-        'message': msg,
-        'data': search_result
-    }
-    return Response(result)
+class SearchKeywordView(APIView):
+    @swagger_auto_schema(query_serializer=SearchKeywordSerializer, responses={"200":KeywordResponseSerializer, "404":KeywordResponseSerializer})
+    def get(self, request):
+        keyword = request.query_params.get('keyword')
+        actPlace = request.query_params.get('actPlace')
+        search_result = callByKeyword(keyword, actPlace)
+        result = responseFactory(search_result)
+        if search_result is None:
+            return Response(result,status=status.HTTP_404_NOT_FOUND)
+        return Response(result,status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-def search_area(request): # return as json
-
-    keyword = request.data.get('keyword')
-
-    search_result = callByArea(keyword)
-    code, msg = responseFactory(search_result)
-    result = {
-        'status': code,
-        'message': msg,
-        'data': search_result
-    }
-    return Response(result)
+class SearchAreaView(APIView):
+    @swagger_auto_schema(query_serializer=SearchAreaSerializer, responses={"200":AreaResponseSerializer, "404":AreaResponseSerializer})
+    def get(self, request):
+        keyword = request.query_params.get('keyword')
+        search_result = callByArea(keyword)
+        result = responseFactory(search_result)
+        if search_result is None:
+            return Response(result,status=status.HTTP_404_NOT_FOUND)
+        return Response(result,status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-def search_regist_no(request): # return as json
-
-    progrmRegistNo = request.data.get('keyword')
-    search_result = callByRegistNo(progrmRegistNo)
-    code, msg = responseFactory(search_result)
-    result = {
-        'status': code,
-        'message': msg,
-        'data': search_result
-    }
-    return Response(result)
+class SearchRegistNoView(APIView):
+    @swagger_auto_schema(query_serializer=SearchRegistNoSerializer, responses={"200":RegistNoResponseSerializer, "404":RegistNoResponseSerializer})
+    def get(self, request):
+        keyword = request.query_params.get('keyword')
+        search_result = callByRegistNo(keyword)
+        result = responseFactory(search_result)
+        if search_result is None:
+            return Response(result,status=status.HTTP_404_NOT_FOUND)
+        return Response(result,status=status.HTTP_200_OK)
