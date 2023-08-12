@@ -10,6 +10,7 @@ from .models import *
 from .response import *
 from .comment_service import *
 from .review_service import *
+from .serializers import *
 
 
 def responseFactory(res: ResponseDto):
@@ -103,3 +104,28 @@ class CommentDetail(APIView):
         self.check_object_permissions(self.request, comment)
         comment.delete()
         return JsonResponse(status=204, data={'msg': message['CommentDeleteSuccess']})
+
+
+### 리뷰 응원하기 ###
+class ReviewCheerGetView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        cheered_reviews = Cheered_Review.objects.filter(writer=request.user)
+        review_id_list = list(cheered_reviews.values_list('review', flat=True))
+        res = ResponseDto(status=200, data=review_id_list, msg=message["CheeredReviewListGetSuccess"])
+        return responseFactory(res)
+
+
+class ReviewCheerView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, rid):
+        user = request.user
+        res = cheer_review(user, rid)
+        return responseFactory(res)
+    
+    def delete(self, request, rid):
+        user = request.user
+        res = cancel_cheering_review(user, rid)
+        return responseFactory(res)

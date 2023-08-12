@@ -28,7 +28,12 @@ message = {
     "CommentCreateSuccess": "댓글 생성 성공",
     "CommentPutSuccess": "댓글 수정 성공",
     "CommentDeleteSuccess": "댓글 삭제 성공",
-    
     "InvalidFormat": "올바르지 않은 형식",
     
+    # 리뷰 응원 관련
+    "CheeredReviewListGetSuccess": "응원한 리뷰 리스트 조회 성공",
+    "CheerReviewSuccess": "리뷰 응원 성공",
+    "AlreadyCheered": "이미 응원한 리뷰",
+    "CancelCheeringSuccess": "리뷰 응원 취소하기 성공",
+    "CancelCheeringFail": "해당 리뷰를 응원한 적 없음"
 }
