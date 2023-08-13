@@ -6,10 +6,15 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 
 from .service import *
 from .models import *
 from .response import *
+from .serializers import *
 
 
 def responseFactory(res: ResponseDto):
@@ -21,6 +26,12 @@ def responseFactory(res: ResponseDto):
             data={ "msg": res.msg, "data": res.data }
         )
 
+parameter_token = openapi.Parameter(
+    "Authorization",
+    openapi.IN_HEADER,
+    description = "access_token",
+    type = openapi.TYPE_STRING
+)
 
 
 # 구글 로그인
@@ -57,26 +68,56 @@ class GoogleLogin(SocialLoginView):
 
 
 ### 유저 관련
-class UsernameView(APIView):
+class UsernameView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = DefaultSerializer
 
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            401: '권한 없음'
+        })
     def put(self, request):
+        '''
+            ## 유저네임 변경
+        '''
         res = update_username(request)
         return responseFactory(res)
 
 
-class ResolMsgView(APIView):
+class ResolMsgView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = DefaultSerializer
     
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            401: '권한 없음'
+        })
     def put(self, request):
+        '''
+            ## 다짐메세지 변경
+        '''
         res = update_resol_msg(request)
         return responseFactory(res)
 
 
-class FightingView(APIView):
+class FightingView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = DefaultSerializer
 
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            401: '권한 없음'
+        })
     def post(self, request):
+        '''
+            ## 파이팅 1점 올리기
+        '''
         user = request.user
         res = inc_fighting(user)
         return responseFactory(res)

@@ -16,6 +16,11 @@ from search.service import *
 class SearchKeywordView(APIView):
     @swagger_auto_schema(query_serializer=SearchKeywordSerializer, responses={"200":KeywordResponseSerializer, "404":KeywordResponseSerializer})
     def get(self, request):
+        '''
+            ## 키워드로 조회
+            - `keyword`: 검색할 키워드
+            - `actPlace`: 장소 (필수 필드 아님) Ex. 상도
+        '''
         keyword = request.query_params.get('keyword')
         actPlace = request.query_params.get('actPlace')
         search_result = callByKeyword(keyword, actPlace)
@@ -28,6 +33,10 @@ class SearchKeywordView(APIView):
 class SearchAreaView(APIView):
     @swagger_auto_schema(query_serializer=SearchAreaSerializer, responses={"200":AreaResponseSerializer, "404":AreaResponseSerializer})
     def get(self, request):
+        '''
+            ## 지역으로 조회
+            - `keyword`: 지역코드(구군) Ex. 3120000
+        '''
         keyword = request.query_params.get('keyword')
         search_result = callByArea(keyword)
         result = responseFactory(search_result)
@@ -39,6 +48,9 @@ class SearchAreaView(APIView):
 class SearchRegistNoView(APIView):
     @swagger_auto_schema(query_serializer=SearchRegistNoSerializer, responses={"200":RegistNoResponseSerializer, "404":RegistNoResponseSerializer})
     def get(self, request):
+        '''
+            ## 봉사ID(`progrmRegistNo`)으로 세부 봉사내용 조회
+        '''
         keyword = request.query_params.get('keyword')
         search_result = callByRegistNo(keyword)
         result = responseFactory(search_result)
