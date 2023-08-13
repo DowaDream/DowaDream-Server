@@ -28,7 +28,8 @@ urlpatterns = [
     path('user/', include('dj_rest_auth.urls')),
     path('user/', include('allauth.urls')),
     
-    path('review/', include('review.urls'))
+    path('review/', include('review.urls')),
+    path('program/', include('program.urls'))
 ]
 
 # DEBUG 모드 켜져있을때만 swagger 문서가 보이도록 해주는 설정
