@@ -72,7 +72,7 @@ class UserReviewList(GenericAPIView):
             ## 리뷰 생성
             - 밑의 필드 외에 images 필드도 넣어줘야 합니다
             - 예시 사진
-            ![image](https://file.notion.so/f/s/8ba91822-2444-471f-b6a3-2e87685c8d62/Untitled.png?id=84b8b60d-3029-4d5d-b66a-d8eeb67767f5&table=block&spaceId=f33e0516-75c1-4b3e-b02d-479e88e873e0&expirationTimestamp=1691863200000&signature=FqJwwJgtgprOzjOCj2D7c4BmnmTHyxtYlgGwaEaZ1l0&downloadName=Untitled.png)
+            ![image](https://file.notion.so/f/s/3ec62a87-cccd-49f7-a24b-cf63e8a63eec/Untitled.png?id=ac457176-148f-47b4-b3ce-335025a1304b&table=block&spaceId=f33e0516-75c1-4b3e-b02d-479e88e873e0&expirationTimestamp=1691863200000&signature=r1WFlmDWmBov1IgMdj66vFTPlhlaXpcH2Nya0NDVkjU&downloadName=Untitled.png)
         '''
         res = post_review(request)
         if res.status >= 400:
@@ -134,7 +134,7 @@ class UserReviewDetail(GenericAPIView):
             ## 리뷰 수정
             - 밑의 필드 외에 images 필드도 넣어줘야 합니다
             - 예시 사진
-            ![image](https://file.notion.so/f/s/8ba91822-2444-471f-b6a3-2e87685c8d62/Untitled.png?id=84b8b60d-3029-4d5d-b66a-d8eeb67767f5&table=block&spaceId=f33e0516-75c1-4b3e-b02d-479e88e873e0&expirationTimestamp=1691863200000&signature=FqJwwJgtgprOzjOCj2D7c4BmnmTHyxtYlgGwaEaZ1l0&downloadName=Untitled.png)
+            ![image](https://file.notion.so/f/s/3ec62a87-cccd-49f7-a24b-cf63e8a63eec/Untitled.png?id=ac457176-148f-47b4-b3ce-335025a1304b&table=block&spaceId=f33e0516-75c1-4b3e-b02d-479e88e873e0&expirationTimestamp=1691863200000&signature=r1WFlmDWmBov1IgMdj66vFTPlhlaXpcH2Nya0NDVkjU&downloadName=Untitled.png)
         '''
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review) # 인가 체크

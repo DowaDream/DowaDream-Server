@@ -41,5 +41,5 @@ class Image(models.Model):
 class Comment(BaseModel):
     cid = models.AutoField(primary_key=True, verbose_name="댓글 ID")
     writer = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False, verbose_name="댓글 작성자")
-    content = models.TextField(verbose_name="댓글 텍스트", blank=False, verbose_name="댓글 내용")
+    content = models.TextField(blank=False, verbose_name="댓글 내용")
     review = models.ForeignKey(to=Review, on_delete=models.CASCADE, blank=False)
