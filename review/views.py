@@ -71,6 +71,7 @@ class UserReviewList(GenericAPIView):
         '''
             ## 리뷰 생성
             - 밑의 필드 외에 images 필드도 넣어줘야 합니다
+            (현재 Swagger로 실행 못시킴, Postman으로 테스트 가능)
             - 예시 사진
             ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230813133610303_APISpecCapture.png)
         '''
@@ -133,6 +134,7 @@ class UserReviewDetail(GenericAPIView):
         '''
             ## 리뷰 수정
             - 밑의 필드 외에 images 필드도 넣어줘야 합니다
+            (현재 Swagger로 실행 못시킴, Postman으로 테스트 가능)
             - 예시 사진
             ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230813133610303_APISpecCapture.png)
         '''
