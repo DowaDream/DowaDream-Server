@@ -57,3 +57,8 @@ class ReviewSwaggerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         exclude = ('rid', 'writer')
+
+class DefaultSwaggerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cheered_Review
+        fields = []

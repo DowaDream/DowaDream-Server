@@ -57,7 +57,7 @@ def put_review(request, review) -> ResponseDto:
 
 def get_all_review_list() -> ResponseDto:
     review_list = []
-    reviews = Review.objects.all()
+    reviews = Review.objects.all().order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
@@ -67,14 +67,14 @@ def get_all_review_list() -> ResponseDto:
 
 
 def get_user_review_list(user) -> ResponseDto:
-    reviews = Review.objects.filter(writer=user)  # 해당 유저가 쓴 리뷰들 가져오기
+    reviews = Review.objects.filter(writer=user).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
     serializer = ReviewSerializer(reviews, many=True)  # Review 객체들을 직렬화
     return ResponseDto(status=200, data=serializer.data, msg=message['UserReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
     review_list = []
-    reviews = Review.objects.filter(progrmRegistNo=progrmRegistNo)
+    reviews = Review.objects.filter(progrmRegistNo=progrmRegistNo).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
@@ -94,7 +94,7 @@ def get_one_review(rid) -> ResponseDto:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
 
-def delete_review(review):
+def delete_review(review) -> ResponseDto:
     res = delete_images_db(review.rid)
     review.delete()
     if res == 204:   # 삭제 성공
@@ -106,11 +106,11 @@ def delete_review(review):
 
 
 ### 리뷰 응원하기
-def cheer_review(user, rid):
+def cheer_review(user, rid) -> ResponseDto:
     try:
         review = Review.objects.get(rid=rid)
     except Review.DoesNotExist:
-        return ResponseDto(status=400, msg=message['ReviewNotFound'])
+        return ResponseDto(status=404, msg=message['ReviewNotFound'])
         
     cheer, is_created = Cheered_Review.objects.get_or_create(writer=user, review=review)
     if is_created:
@@ -118,11 +118,11 @@ def cheer_review(user, rid):
     else:
         return ResponseDto(status=400, msg=message['AlreadyCheered'])
 
-def cancel_cheering_review(user, rid):
+def cancel_cheering_review(user, rid) -> ResponseDto:
     try:
         review = Review.objects.get(rid=rid)
     except Review.DoesNotExist:
-        return ResponseDto(status=400, msg=message['ReviewNotFound'])
+        return ResponseDto(status=404, msg=message['ReviewNotFound'])
         
     try:
         cheered_review = Cheered_Review.objects.get(writer=user, review=review)

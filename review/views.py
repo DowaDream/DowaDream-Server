@@ -84,8 +84,7 @@ class UserReviewList(GenericAPIView):
     @swagger_auto_schema(
         responses= {
             200: '리뷰 리스트 조회 성공',
-            400: 'Bad Request',
-            401: '권한 없음'
+            400: 'Bad Request'
         })
     def get(self, request):
         '''
@@ -151,6 +150,7 @@ class UserReviewDetail(GenericAPIView):
         manual_parameters = [parameter_token],
         responses= {
             204: message['ReviewDeleteSuccess'],
+            401: '권한 없음',
             404: message['ReviewNotFound']
         }
     )
@@ -192,6 +192,7 @@ class CommentList(GenericAPIView):
         response = {
             201: message['CommentCreateSuccess'],
             400: 'Bad Request',
+            401: '권한 없음',
             404: message['ReviewNotFound']
         }
     )
@@ -214,6 +215,7 @@ class CommentDetail(GenericAPIView):
         response = {
             200: message['CommentPutSuccess'],
             400: 'Bad Request',
+            401: '권한 없음',
             404: message['ReviewNotFound']
         }
     )
@@ -234,6 +236,7 @@ class CommentDetail(GenericAPIView):
         manual_parameters = [parameter_token],
         response = {
             204: message['CommentDeleteSuccess'],
+            401: '권한 없음',
             404: 'Not Found'
         }
     )
@@ -250,10 +253,22 @@ class CommentDetail(GenericAPIView):
 
 
 ### 리뷰 응원하기 ###
-class ReviewCheerGetView(APIView):
+class ReviewCheerGetView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = DefaultSwaggerSerializer
     
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        response = {
+            200: message['CheeredReviewListGetSuccess'],
+            401: '권한 없음',
+            404: 'Not Found'
+        }
+    )
     def get(self, request):
+        '''
+            ## 로그인한 유저가 응원한 리뷰 리스트 조회
+        '''
         cheered_reviews = Cheered_Review.objects.filter(writer=request.user)
         review_id_list = list(cheered_reviews.values_list('review', flat=True))
         res = ResponseDto(status=200, data=review_id_list, msg=message["CheeredReviewListGetSuccess"])
@@ -262,13 +277,39 @@ class ReviewCheerGetView(APIView):
 
 class ReviewCheerView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = DefaultSwaggerSerializer
     
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        response = {
+            201: message['CheerReviewSuccess'],
+            400: 'Bad Request',
+            401: '권한 없음',
+            404: message['ReviewNotFound']
+        }
+    )
     def post(self, request, rid):
+        '''
+            ## 특정 리뷰를 응원하기
+        '''
         user = request.user
         res = cheer_review(user, rid)
         return responseFactory(res)
     
+    
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        response = {
+            200: message['CancelCheeringSuccess'],
+            400: 'Bad Request',
+            401: '권한 없음',
+            404: message['ReviewNotFound']
+        }
+    )
     def delete(self, request, rid):
+        '''
+            ## 특정 리뷰 응원 취소하기
+        '''
         user = request.user
         res = cancel_cheering_review(user, rid)
         return responseFactory(res)
