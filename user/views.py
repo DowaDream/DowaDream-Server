@@ -4,11 +4,13 @@ from django.http import JsonResponse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
+from requests import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 
 
 from .service import *
@@ -120,4 +122,22 @@ class FightingView(GenericAPIView):
         '''
         user = request.user
         res = inc_fighting(user)
+        return responseFactory(res)
+
+
+### 유저 태그/지역 관련
+class UserTagView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserTagSerializer
+    
+    def post(self, request):
+        res = update_user_tags(request.user, request.data)
+        return responseFactory(res)
+
+class UserRegionView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserRegionSerializer
+    
+    def post(self, request):
+        res = update_user_region(request.user, request.data)
         return responseFactory(res)

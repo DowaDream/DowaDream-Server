@@ -19,4 +19,7 @@ message = {
     "ResolMsgIsEmpty": "다짐 메세지가 비었음",
     "IncreasedFighting": "파이팅 점수 1점 증가",
     
+    "CreatedUserTags": "유저 관심태그 업데이트 성공",
+    "CreatedUserRegion": "유저 관심지역 업데이트 성공",
+    "InvalidRequestForm": "올바르지 않은 Request Body",
 }
