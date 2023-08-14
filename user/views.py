@@ -4,11 +4,13 @@ from django.http import JsonResponse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
+from requests import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 
 
 from .service import *
@@ -120,4 +122,48 @@ class FightingView(GenericAPIView):
         '''
         user = request.user
         res = inc_fighting(user)
+        return responseFactory(res)
+
+
+### 유저 태그/지역 관련
+class UserTagView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserTagSerializer
+    
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            400: 'bad request, 또는 태그 수가 1개 미만/10개 초과',
+            401: '권한 없음'
+        })
+    def post(self, request):
+        '''
+            ## 유저 태그 수정
+            - tags: 리스트 형식의 태그
+            Ex. `"tags": ["tag1", "tag2"]`
+            - 태그가 1개 미만, 10개 초과인 경우 400 에러 발생
+        '''
+        res = update_user_tags(request.user, request.data)
+        return responseFactory(res)
+
+class UserRegionView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserRegionSerializer
+    
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            400: 'bad request, 또는 지역 수가 1개 미만/10개 초과',
+            401: '권한 없음'
+        })
+    def post(self, request):
+        '''
+            ## 유저 지역 수정
+            - regions: 리스트 형식의 지역
+            Ex. `"regions": ["region1", "region2"]`
+            - 지역이 1개 미만, 10개 초과인 경우 400 에러 발생
+        '''
+        res = update_user_region(request.user, request.data)
         return responseFactory(res)

@@ -9,4 +9,7 @@ urlpatterns = [
     path('resol/', ResolMsgView.as_view()),
     path('username/', UsernameView.as_view()),
     path('fighting/', FightingView.as_view()),
+    
+    path('tag/', UserTagView.as_view()),
+    path('region/', UserRegionView.as_view()),
 ]
