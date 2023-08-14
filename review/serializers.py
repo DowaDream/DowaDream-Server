@@ -29,6 +29,17 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+    
+    def validate(self, data):
+        # 봉사 당 하나의 리뷰만 남길 수 있음
+        writer = data.get('writer')
+        progrmRegistNo = data.get('progrmRegistNo')
+        review = Review.objects.filter(writer=writer, progrmRegistNo=progrmRegistNo)
+        if review.exists():
+            raise serializers.ValidationError("이미 객체가 존재함")
+        
+        # 
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
