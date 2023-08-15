@@ -5,11 +5,13 @@ from .jwt_token import make_token
 from django.http import JsonResponse
 from user.models import User
 from json import JSONDecodeError
+from .serializers import *
 
 BASE_URL = settings.BASE_URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
 
+### 구글 로그인 관련 ###
 def get_google_access_token(code):
     client_id = settings.GOOGLE_CLIENT_ID
     client_secret = settings.GOOGLE_PASSWORD
@@ -25,8 +27,6 @@ def get_google_access_token(code):
     access_token = token_req_json.get('access_token')
     return access_token
 
-
-### 구글 로그인 관련 ###
 def get_google_profile(access_token):
     # 가져온 access_token으로 사용자 정보를 구글에 요청
     profile_req = requests.get(f"https://www.googleapis.com/oauth2/v2/userinfo?access_token={access_token}")
@@ -95,3 +95,28 @@ def inc_fighting(user) -> ResponseDto:
     user.fighting += 1
     user.save()
     return ResponseDto(status=200, msg=message['IncreasedFighting'])
+
+
+def update_user_tags(user, data) -> ResponseDto:
+    tags = data.get('tags')
+    serializer = UserTagSerializer(data=data)
+    if not serializer.is_valid():
+        return ResponseDto(status=400, msg=serializer.errors)
+    User_Tag.objects.filter(user=user).delete() # 기존의 태그 삭제
+    created_tags = []
+    for tag in tags:
+        created_tag = User_Tag.objects.create(user=user, tag=tag)
+        created_tags.append(created_tag.tag)
+    return ResponseDto(status=200, data=created_tags, msg=message['CreatedUserTags'])
+
+def update_user_region(user, data) -> ResponseDto:
+    regions = data.get('regions')
+    serializer = UserRegionSerializer(data=data)
+    if not serializer.is_valid():
+        return ResponseDto(status=400, msg=serializer.errors)
+    User_Region.objects.filter(user=user).delete() # 기존의 지역 삭제
+    created_regions = []
+    for region in regions:
+        created_region = User_Region.objects.create(user=user, region=region)
+        created_regions.append(created_region.region)
+    return ResponseDto(status=200, data=created_regions, msg=message['CreatedUserRegion'])
