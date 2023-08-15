@@ -55,7 +55,6 @@ PROJECT_APPS = [
     'user',
     'review',
     'program',
-    'search'
 ]
 
 THIRD_PARTY_APPS = [
