@@ -70,6 +70,15 @@ class GoogleLogin(SocialLoginView):
 
 
 ### 유저 관련
+class UserInfoView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        res = ResponseDto(status=200, data=serializer.data, msg=message["UserInfoGetSuccess"])
+        return responseFactory(res)
+
 class UsernameView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DefaultSerializer

@@ -7,6 +7,11 @@ class DefaultSerializer(ModelSerializer):
         model = User
         fields = []
 
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "date_joined", "profile_img", "fighting", "resol_msg"]
+
 class UserTagSerializer(ModelSerializer):
     class Meta:
         model = User_Tag
