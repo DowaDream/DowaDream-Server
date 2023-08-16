@@ -128,7 +128,7 @@ class ResolMsgView(GenericAPIView):
         })
     def put(self, request):
         '''
-            ## 다짐메세지 변경
+            ## 유저 다짐메세지 변경
         '''
         res = update_resol_msg(request)
         return responseFactory(res)
@@ -146,7 +146,7 @@ class FightingView(GenericAPIView):
         })
     def post(self, request):
         '''
-            ## 파이팅 1점 올리기
+            ## 로그인한 유저의 파이팅 1점 올리기
         '''
         user = request.user
         res = inc_fighting(user)

@@ -73,8 +73,6 @@ class UserReviewList(GenericAPIView):
             - 필수 필드: images, title, content, is_public, progrmRegistNo
             - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
             (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
-            - 예시 사진
-            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230815155225195_captureImg.png)
             - 유저는 봉사 당 하나의 리뷰만 남길 수 있음
             - '내가 한 봉사 목록'에 있는 봉사에만 리뷰를 남길 수 있음
         '''
@@ -91,8 +89,8 @@ class UserReviewList(GenericAPIView):
         })
     def get(self, request):
         '''
-            ## 리뷰 리스트 조회(아직 정렬X)
-            - Default값으로 신규순 정렬해서 모든 리뷰 조회하기: `/review/`
+            ## 리뷰 리스트 조회(신규순으로 정렬)
+            - 모든 리뷰 조회하기: `/review/`
             - 특정 봉사에 대한 리뷰 조회: `/review?progrmRegistNo=xxx`
         '''
         progrmRegistNo = request.GET.get('progrmRegistNo')
@@ -138,8 +136,6 @@ class UserReviewDetail(GenericAPIView):
             - 필수 필드: images, title, content, is_public, progrmRegistNo
             - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
             (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
-            - 예시 사진
-            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230815155225195_captureImg.png)
         '''
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review) # 인가 체크
@@ -294,7 +290,7 @@ class ReviewCheerView(APIView):
     )
     def post(self, request, rid):
         '''
-            ## 특정 리뷰를 응원하기
+            ## (로그인한 유저가) 특정 리뷰를 응원하기
         '''
         user = request.user
         res = cheer_review(user, rid)
@@ -312,7 +308,7 @@ class ReviewCheerView(APIView):
     )
     def delete(self, request, rid):
         '''
-            ## 특정 리뷰 응원 취소하기
+            ## (로그인한 유저가) 특정 리뷰 응원 취소하기
         '''
         user = request.user
         res = cancel_cheering_review(user, rid)
