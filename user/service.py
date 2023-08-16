@@ -71,6 +71,20 @@ def google_callback_signup(data, email, profile_img) -> ResponseDto:
 
 
 ### 유저 관련 ###
+def get_userinfo(user) -> ResponseDto:
+    serializer = UserSerializer(user)
+    user_info = serializer.data
+    
+    user_tags = User_Tag.objects.filter(user=user)
+    user_regions = User_Region.objects.filter(user=user)
+    user_tags_serializer = UserTagSerializer(user_tags, many=True)
+    user_regions_serializer = UserRegionSerializer(user_regions, many=True)
+
+    user_info['user_tags'] = [tag['tag'] for tag in user_tags_serializer.data]
+    user_info['user_regions'] = [region['region'] for region in user_regions_serializer.data]
+    
+    return ResponseDto(status=200, data=user_info, msg=message["UserInfoGetSuccess"])
+
 def update_username(request):
     new_name = request.data.get('username')
     if new_name:
@@ -97,6 +111,8 @@ def inc_fighting(user) -> ResponseDto:
     return ResponseDto(status=200, msg=message['IncreasedFighting'])
 
 
+
+### 유저 태그/지역 관련
 def update_user_tags(user, data) -> ResponseDto:
     tags = data.get('tags')
     serializer = UserTagListSerializer(data=data)

@@ -74,20 +74,28 @@ class GoogleLogin(SocialLoginView):
 class UserInfoView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            401: '권한 없음'
+        })
     def get(self, request):
-        user = request.user
-        serializer = UserSerializer(user)
-        user_info = serializer.data
-        
-        user_tags = User_Tag.objects.filter(user=user)
-        user_regions = User_Region.objects.filter(user=user)
-        user_tags_serializer = UserTagSerializer(user_tags, many=True)
-        user_regions_serializer = UserRegionSerializer(user_regions, many=True)
-
-        user_info['user_tags'] = [tag['tag'] for tag in user_tags_serializer.data]
-        user_info['user_regions'] = [region['region'] for region in user_regions_serializer.data]
-        
-        res = ResponseDto(status=200, data=user_info, msg=message["UserInfoGetSuccess"])
+        '''
+            ## 유저 정보 조회
+            `
+            "id": 2,
+            "username": "이름",
+            "email": "pse314@gmail.com",
+            "date_joined": "2023-08-04T11:59:59.753534+09:00",
+            "profile_img": null,
+            "fighting": 5,
+            "resol_msg": "아자아자 파이팅",
+            "user_tags": [ "tag1", "tag2" ],
+            "user_regions": [ "관심지역3" ]
+            `
+        '''
+        res = get_userinfo(request.user)
         return responseFactory(res)
 
 class UsernameView(GenericAPIView):
