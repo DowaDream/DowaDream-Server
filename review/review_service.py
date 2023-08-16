@@ -56,36 +56,32 @@ def put_review(request, review) -> ResponseDto:
     return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
 
 
-def get_all_review_list() -> ResponseDto:
+# Code Refactoring: 반복되는 코드: 리뷰 리스트 조회하기
+def get_reviews(reviews):
     review_list = []
-    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
         review_data["images"] = [str(image.image) for image in images]
         review_list.append(review_data)
+    return review_list
+
+
+def get_all_review_list() -> ResponseDto:
+    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
 
 
 def get_user_review_list(user) -> ResponseDto:
-    review_list = []
     reviews = Review.objects.filter(writer=user).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
-    for review in reviews:
-        images = Image.objects.filter(review__rid=review.rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        review_list.append(review_data)
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['UserReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
-    review_list = []
     reviews = Review.objects.filter(progrmRegistNo=progrmRegistNo).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
-    for review in reviews:
-        images = Image.objects.filter(review__rid=review.rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        review_list.append(review_data)
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['ReviewListInProgramGetSuccess'])
 
 
