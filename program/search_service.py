@@ -260,6 +260,7 @@ def callByDday():
         response = requests.get(url, params=params)
         parsed_xml = xmltodict.parse(response.text)
 
+
         if parsed_xml["response"]["header"]["resultCode"] == "00":
             itemsList = parsed_xml["response"]["body"]["items"]
             if itemsList is None:
