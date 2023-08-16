@@ -1,10 +1,16 @@
-from django.db.models import Count
+import json
+from datetime import datetime
+
+import json
+from pathlib import Path
+from django.conf import settings
 
 from .response import *
 from .models import *
 from .serializers import *
 from .dto import ProgramDto
 from .search_service import *
+
 
 
 def update_progrm_interact(data, user) -> ResponseDto:
@@ -40,6 +46,7 @@ def get_interactions_list(user, field_name):
     interactions = Program_Interaction.objects.filter(user=user, **{field_name: True})
     interations_list = list(interactions.values_list('progrmRegistNo', flat=True))  # flat=False: value 하나를 list로 저장
     return interations_list
+
 
 
 def get_cheer_recommend():

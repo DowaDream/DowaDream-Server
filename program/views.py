@@ -9,9 +9,10 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from .service import *
+from .search_service import *
 from .response import *
 from .serializers import *
-from .search_service import *
+# from .search_service import *
 
 
 def responseFactory(res: ResponseDto):
@@ -55,7 +56,6 @@ class PrgmInteractUpdateView(GenericAPIView):
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
-        message = "테스트",
         responses= {
             200: message['PrgmInteractSuccess'],
             400: message['PrgmInteractFail'],
@@ -141,10 +141,14 @@ class SearchKeywordView(APIView):
             ## 봉사 조회: 키워드로 조회
             - `keyword`: 검색할 키워드
             - `actPlace`: 장소 (필수 필드 아님) Ex. 상도
+            - `tagCode`: 분야코드 (필수 필드 아님) Ex. 0101
+            - `areaCode`: 지역코드 (필수 필드 아님) Ex. 3510000
         '''
         keyword = request.query_params.get('keyword')
         actPlace = request.query_params.get('actPlace')
-        search_result = callByKeyword(keyword, actPlace)
+        tagCode = request.query_params.get('tagCode')
+        areaCode = request.query_params.get('areaCode')
+        search_result = callByKeyword(keyword, actPlace, tagCode, areaCode)
         result = searchResponseFactory(search_result)
         if search_result is None:
             return Response(result,status=status.HTTP_404_NOT_FOUND)
