@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from .service import *
 from .response import *
 from .serializers import *
+from .search_service import *
 
 
 def responseFactory(res: ResponseDto):
@@ -30,12 +31,24 @@ parameter_token = openapi.Parameter(
 )
 
 
+### 봉사 추천 관련
+class PrgmRecommendCheeringView(GenericAPIView):
+    permission_classes = []
+
+    def get(self, request):
+        res = get_cheer_recommend()
+        return responseFactory(res)
+
+
+
+### 봉사 Interaction(응원, 스크랩, 참여)
 class PrgmInteractUpdateView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = SwaggerInteractSerializer
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
+        message = "테스트",
         responses= {
             200: message['PrgmInteractSuccess'],
             400: message['PrgmInteractFail'],
@@ -44,7 +57,6 @@ class PrgmInteractUpdateView(GenericAPIView):
     def put(self, request):
         '''
             ## 봉사 스크랩하기/응원하기/내가 한 봉사 저장하기
-            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230813134434489_APISpecCapture2.png)
             - `progrmRegistNo` 필드는 필수입니다
             - `cheered`, `participated`, `clipped` 필드는 필수가 아닙니다.
             예를 들어 봉사번호 123445를 스크랩하려면 위의 사진처럼 request를 보내시면 됩니다

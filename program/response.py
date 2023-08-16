@@ -7,6 +7,8 @@ class ResponseDto:
 
 
 message = {
+    "PrgrmRecommendCheer": "봉사 추천: 응원순 조회 성공",
+    
     "PrgmInteractSuccess": "봉사내역/스크랩/응원하기 상태 업데이트 성공",
     "PrgmInteractFail": "봉사내역/스크랩/응원하기 상태 업데이트 실패",
     
