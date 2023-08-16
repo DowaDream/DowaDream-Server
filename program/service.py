@@ -1,6 +1,5 @@
-import json
 from datetime import datetime
-
+from django.db.models import Count
 import json
 from pathlib import Path
 from django.conf import settings

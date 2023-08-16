@@ -233,7 +233,7 @@ def callByRegistNo(registNo):
         temp['recruitStart'] = recruitStart
         temp['recruitEnd'] = recruitEnd
         temp['recruitInstitute'] = item.get('mnnstNm')
-        temp['registerInstiute'] = item.get('nanmmbyNm')
+        temp['registerInstitute'] = item.get('nanmmbyNm')
         temp['maxPerson'] = item.get('rcritNmpr')
         temp['content']= item.get('progrmCn')
         temp['progrmRegistNo'] = registNo
