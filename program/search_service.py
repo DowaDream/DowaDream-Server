@@ -1,83 +1,8 @@
-import json
-from datetime import datetime
-
 import requests
 import xmltodict
 from django.conf import settings
 from django.http import JsonResponse
 from user.models import User
-
-from .response import *
-from .models import *
-from .serializers import *
-from .dto import ProgramDto
-from .search_service import *
-
-
-def update_progrm_interact(data, user) -> ResponseDto:
-    progrmRegistNo = data.get('progrmRegistNo')
-    
-    try:
-        interact = Program_Interaction.objects.get(progrmRegistNo=progrmRegistNo, user=user)
-    
-    except Program_Interaction.DoesNotExist:
-        # 해당하는 progrmRegistNo가 없으면 새로운 튜플 생성
-        interact = Program_Interaction(progrmRegistNo=progrmRegistNo, user=user)
-    
-    # request body에서 해당 필드의 값을 가져오고, 필드 값이 없으면 기존값을 넣음
-    cheered = data.get('cheered', interact.cheered)
-    participated = data.get('participated', interact.participated)
-    clipped = data.get('clipped', interact.clipped)
-    
-    # 필드 값 설정
-    interact.cheered = cheered
-    interact.participated = participated
-    interact.clipped = clipped
-    interact.user = user
-    
-    serializer = PrgmInteractSerializer(interact, data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return ResponseDto(status=200, data=serializer.data, msg=message['PrgmInteractSuccess'])
-    
-    return ResponseDto(status=400, data=serializer.errors, msg=message['PrgmInteractFail'])
-
-
-def get_interactions_list(user, field_name):
-    interactions = Program_Interaction.objects.filter(user=user, **{field_name: True})
-    interations_list = list(interactions.values_list('progrmRegistNo', flat=True))  # flat=False: value 하나를 list로 저장
-    return interations_list
-
-
-
-def get_cheer_recommend():
-    interactions = Program_Interaction.objects.filter(cheered=True).annotate(cheer_count=Count('cheered')).order_by('-cheer_count')
-    progrmList = list(interactions.values_list('progrmRegistNo', flat=True))
-    
-    data = []
-    for program in progrmList[:4]:
-        p_data = callByRegistNo(program)
-        program_dto_data = ProgramDto(tagName=p_data['tagName'], title=p_data['title'], registerInstitute=p_data['registerInstitute'], \
-                                        recruitStart=p_data['recruitStart'], recruitEnd=p_data['recruitEnd'], actStart=p_data['actStart'], actEnd=p_data['actEnd'])
-        data.append(program_dto_data.to_json())
-    return ResponseDto(status=200, data=data, msg=message['PrgrmRecommendCheer'])
-
-
-    return None
-def findTagCode(tagName):
-    # split tagname by ' > '
-    tagNameHigh = tagName.split(' > ')[0]
-    # find tagCodeHigh from tagList.json
-    with open(CURRENT_PATH / 'tagList.json', 'r', encoding='utf-8') as f:
-        tagList = json.load(f)
-    for tag in tagList:
-        if tag['hignClsNm'] == tagNameHigh and tag['lowClsNm'] == tagNameLow:
-            tagCodeHigh = tag['highClsCd']
-            tagCodeLow = tag['lowClsCd']
-            return tagCodeLow
-    tagNameLow = tagName.split(' > ')[1]
-
-
 
 def callByKeyword(keyword, actPlace=None):
     url = 'http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrSearchWordList'
@@ -208,12 +133,12 @@ def callByRegistNo(registNo):
         temp['recruitStart'] = recruitStart
         temp['recruitEnd'] = recruitEnd
         temp['recruitInstitute'] = item.get('mnnstNm')
-        temp['registerInstiute'] = item.get('nanmmbyNm')
+        temp['registerInstitute'] = item.get('nanmmbyNm')
         temp['maxPerson'] = item.get('rcritNmpr')
         temp['content']= item.get('progrmCn')
         temp['progrmRegistNo'] = registNo
+        temp['tagName']= item.get('srvcClCode')
 
         return temp
     else:
         return None
-
