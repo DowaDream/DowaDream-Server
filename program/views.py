@@ -35,7 +35,14 @@ parameter_token = openapi.Parameter(
 class PrgmRecommendCheeringView(GenericAPIView):
     permission_classes = []
 
+    @swagger_auto_schema(
+        responses= {
+            200: message['PrgrmRecommendCheer']
+        })
     def get(self, request):
+        '''
+            ## 봉사 추천: 응원하기 가장 많은 봉사 4개
+        '''
         res = get_cheer_recommend()
         return responseFactory(res)
 
@@ -48,7 +55,6 @@ class PrgmInteractUpdateView(GenericAPIView):
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
-        message = "테스트",
         responses= {
             200: message['PrgmInteractSuccess'],
             400: message['PrgmInteractFail'],
@@ -59,7 +65,8 @@ class PrgmInteractUpdateView(GenericAPIView):
             ## 봉사 스크랩하기/응원하기/내가 한 봉사 저장하기
             - `progrmRegistNo` 필드는 필수입니다
             - `cheered`, `participated`, `clipped` 필드는 필수가 아닙니다.
-            예를 들어 봉사번호 123445를 스크랩하려면 위의 사진처럼 request를 보내시면 됩니다
+            예를 들어 봉사번호 123445를 스크랩하려면 
+            { "progrmRegistNo": "123445", "clipped": "True" }
             - 스크랩 취소는 `"clipped": "False"`로 보내시면 됩니다.
         '''
         request.data['user'] = request.user.id
@@ -78,7 +85,7 @@ class CheeredGetView(GenericAPIView):
         })
     def get(self, request):
         '''
-            ## 응원한 봉사 리스트 조회
+            ## 로그인한 유저가 응원한 봉사 리스트 조회
         '''
         user = request.user
         interations_list = get_interactions_list(user, 'cheered')
@@ -97,7 +104,7 @@ class ParticipatedGetView(GenericAPIView):
         })
     def get(self, request):
         '''
-            ## 참여한 봉사 리스트 조회
+            ## 로그인한 유저가 참여한 봉사 리스트 조회
         '''
         user = request.user
         interations_list = get_interactions_list(user, 'participated')
@@ -116,7 +123,7 @@ class ClippedGetView(GenericAPIView):
         })
     def get(self, request):
         '''
-            ## 스크랩한 봉사 리스트 조회
+            ## 로그인한 유저가 스크랩한 봉사 리스트 조회
         '''
         user = request.user
         interations_list = get_interactions_list(user, 'clipped')
@@ -130,7 +137,7 @@ class SearchKeywordView(APIView):
     @swagger_auto_schema(query_serializer=SearchKeywordSerializer, responses={"200":KeywordResponseSerializer, "404":KeywordResponseSerializer})
     def get(self, request):
         '''
-            ## 키워드로 조회
+            ## 봉사 조회: 키워드로 조회
             - `keyword`: 검색할 키워드
             - `actPlace`: 장소 (필수 필드 아님) Ex. 상도
         '''
@@ -147,7 +154,7 @@ class SearchAreaView(APIView):
     @swagger_auto_schema(query_serializer=SearchAreaSerializer, responses={"200":AreaResponseSerializer, "404":AreaResponseSerializer})
     def get(self, request):
         '''
-            ## 지역으로 조회
+            ## 봉사 조회: 지역으로 조회
             - `keyword`: 지역코드(구군) Ex. 3120000
         '''
         keyword = request.query_params.get('keyword')
