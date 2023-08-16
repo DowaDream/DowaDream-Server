@@ -15,6 +15,17 @@ class UserSerializer(ModelSerializer):
 class UserTagSerializer(ModelSerializer):
     class Meta:
         model = User_Tag
+        fields = ["tag"]
+
+class UserRegionSerializer(ModelSerializer):
+    class Meta:
+        model = User_Region
+        fields = ["region"]
+
+
+class UserTagListSerializer(ModelSerializer):
+    class Meta:
+        model = User_Tag
         fields = ['tags']
 
     tags = serializers.ListField(
@@ -23,7 +34,7 @@ class UserTagSerializer(ModelSerializer):
         max_length=10
     )
 
-class UserRegionSerializer(ModelSerializer):
+class UserRegionListSerializer(ModelSerializer):
     class Meta:
         model = User_Region
         fields = ["regions"]

@@ -99,7 +99,7 @@ def inc_fighting(user) -> ResponseDto:
 
 def update_user_tags(user, data) -> ResponseDto:
     tags = data.get('tags')
-    serializer = UserTagSerializer(data=data)
+    serializer = UserTagListSerializer(data=data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
     User_Tag.objects.filter(user=user).delete() # 기존의 태그 삭제
@@ -111,7 +111,7 @@ def update_user_tags(user, data) -> ResponseDto:
 
 def update_user_region(user, data) -> ResponseDto:
     regions = data.get('regions')
-    serializer = UserRegionSerializer(data=data)
+    serializer = UserRegionListSerializer(data=data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
     User_Region.objects.filter(user=user).delete() # 기존의 지역 삭제

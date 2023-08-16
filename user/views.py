@@ -11,6 +11,7 @@ from rest_framework.generics import GenericAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from django.core.serializers import serialize
 
 
 from .service import *
@@ -76,7 +77,17 @@ class UserInfoView(GenericAPIView):
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)
-        res = ResponseDto(status=200, data=serializer.data, msg=message["UserInfoGetSuccess"])
+        user_info = serializer.data
+        
+        user_tags = User_Tag.objects.filter(user=user)
+        user_regions = User_Region.objects.filter(user=user)
+        user_tags_serializer = UserTagSerializer(user_tags, many=True)
+        user_regions_serializer = UserRegionSerializer(user_regions, many=True)
+
+        user_info['user_tags'] = [tag['tag'] for tag in user_tags_serializer.data]
+        user_info['user_regions'] = [region['region'] for region in user_regions_serializer.data]
+        
+        res = ResponseDto(status=200, data=user_info, msg=message["UserInfoGetSuccess"])
         return responseFactory(res)
 
 class UsernameView(GenericAPIView):
@@ -137,7 +148,7 @@ class FightingView(GenericAPIView):
 ### 유저 태그/지역 관련
 class UserTagView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = UserTagSerializer
+    serializer_class = UserTagListSerializer
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
@@ -158,7 +169,7 @@ class UserTagView(GenericAPIView):
 
 class UserRegionView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = UserRegionSerializer
+    serializer_class = UserRegionListSerializer
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
