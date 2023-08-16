@@ -20,6 +20,7 @@ class SearchKeywordSerializer(serializers.Serializer):
 
 class SearchAreaSerializer(serializers.Serializer):
     keyword = serializers.CharField()
+
     
 class SearchRegistNoSerializer(serializers.Serializer):
     keyword = serializers.CharField(required=True)
@@ -36,6 +37,7 @@ class KeywordDictSerializer(serializers.Serializer):
     actEnd = serializers.CharField()
     progrmRegistNo = serializers.CharField()
     dday = serializers.CharField()
+    url = serializers.CharField()
 
 class KeywordResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
@@ -75,3 +77,20 @@ class RegistNoResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
     message = serializers.CharField()
     data = RegistNoDictSerializer(many=True)
+
+class DdayDictSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    place = serializers.CharField()
+    recruitInstitute = serializers.CharField()
+    recruitStart = serializers.CharField()
+    recruitEnd = serializers.CharField()
+    actStart = serializers.CharField()
+    actEnd = serializers.CharField()
+    progrmRegistNo = serializers.CharField()
+    dday = serializers.CharField()
+    url = serializers.CharField()
+
+class DdayResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    message = serializers.CharField()
+    data = DdayDictSerializer(many=True)

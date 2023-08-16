@@ -12,4 +12,5 @@ urlpatterns = [
     path('search/keyword/', SearchKeywordView.as_view(), name='search_keyword'),
     path('search/area/', SearchAreaView.as_view(), name='search_area'),
     path('search/registno/', SearchRegistNoView.as_view(), name='search_regist_no'),
+    path('search/dday/', SearchDdayView.as_view(), name='search_dday'),
 ]

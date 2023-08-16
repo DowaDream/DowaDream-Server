@@ -1,7 +1,7 @@
 import requests
 import xmltodict
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 from pathlib import Path
@@ -245,3 +245,54 @@ def callByRegistNo(registNo):
         return temp
     else:
         return None
+
+def callByDday():
+    url = 'http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrSearchWordList'
+
+    # convert to string, yyyymmdd
+    today = datetime.today().strftime('%Y%m%d')
+
+    result = []
+    while len(result) < 10:
+        params ={
+            'noticeEndde' : today,
+        }
+        response = requests.get(url, params=params)
+        parsed_xml = xmltodict.parse(response.text)
+
+        if parsed_xml["response"]["header"]["resultCode"] == "00":
+            itemsList = parsed_xml["response"]["body"]["items"]
+            if itemsList is None:
+                return None
+            items = itemsList['item']
+            for item in items:
+                temp = {}
+                temp['title'] = item.get('progrmSj')
+                temp['place'] = item.get('actPlace')
+                temp['progrmRegistNo'] = item.get('progrmRegistNo')
+                temp['recruitInstitute'] = item.get('nanmmbyNm')
+                temp['url'] = item.get('url')
+
+                # yyyymmdd -> yyyy/mm/dd
+                unparsedRecStartDate = item.get('noticeBgnde')
+                temp['recruitStart'] = unparsedRecStartDate[0:4] + '/' + unparsedRecStartDate[4:6] + '/' + unparsedRecStartDate[6:8]
+                unparsedRecEndDate = item.get('noticeEndde')
+                temp['recruitEnd'] = unparsedRecEndDate[0:4] + '/' + unparsedRecEndDate[4:6] + '/' + unparsedRecEndDate[6:8]
+
+                # yyyymmdd -> yyyy/mm/dd-hh:mm:ss
+                unparsedActStartDate = item.get('progrmBgnde')
+                unparsedActStartTime = item.get('actBeginTm')
+                # if unparsedActStartTime is smaller than 10, add 0
+                if int(unparsedActStartTime) < 10:
+                    unparsedActStartTime = '0' + unparsedActStartTime
+                temp['actStart'] = unparsedActStartDate[0:4] + '/' + unparsedActStartDate[4:6] + '/' + unparsedActStartDate[6:8] + '-' + unparsedActStartTime + ':00:00'
+                unparsedActEndDate = item.get('progrmEndde')
+                unparsedActEndTime = item.get('actEndTm')
+                temp['actEnd'] = unparsedActEndDate[0:4] + '/' + unparsedActEndDate[4:6] + '/'+ unparsedActEndDate[6:8] + '-' + unparsedActEndTime + ':00:00'
+
+                # d-day 계산 -> recruitEnd - today
+                temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
+                result.append(temp)
+    if result is None:
+        return None
+    return result

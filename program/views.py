@@ -182,3 +182,15 @@ class SearchRegistNoView(APIView):
         if search_result is None:
             return Response(result,status=status.HTTP_404_NOT_FOUND)
         return Response(result,status=status.HTTP_200_OK)
+    
+class SearchDdayView(APIView):
+    @swagger_auto_schema(responses={"200":DdayResponseSerializer, "404":DdayResponseSerializer})
+    def get(self, request):
+        '''
+            ## 마감임박순으로 세부 봉사내용 조회
+        '''
+        search_result = callByDday()
+        result = searchResponseFactory(search_result)
+        if search_result is None:
+            return Response(result,status=status.HTTP_404_NOT_FOUND)
+        return Response(result,status=status.HTTP_200_OK)
