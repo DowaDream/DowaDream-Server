@@ -15,3 +15,15 @@ message = {
     "ClippedGetSuccess": "스크랩한 봉사 리스트 조회 성공",
     
 }
+
+def searchResponseFactory(result):
+    code = 200
+    msg = 'OK'
+    if result is None:
+        code = '404'
+        msg = 'Not Found'
+    return {
+            'status': code,
+            'message': msg,
+            'data': result
+        }
