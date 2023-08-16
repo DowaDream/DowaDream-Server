@@ -3,6 +3,7 @@ import xmltodict
 from django.conf import settings
 from django.http import JsonResponse
 from user.models import User
+from django.db.models import Count
 
 from .response import *
 from .models import *
@@ -177,10 +178,11 @@ def callByRegistNo(registNo):
         temp['recruitStart'] = recruitStart
         temp['recruitEnd'] = recruitEnd
         temp['recruitInstitute'] = item.get('mnnstNm')
-        temp['registerInstiute'] = item.get('nanmmbyNm')
+        temp['registerInstitute'] = item.get('nanmmbyNm')
         temp['maxPerson'] = item.get('rcritNmpr')
         temp['content']= item.get('progrmCn')
         temp['progrmRegistNo'] = registNo
+        temp['tagName']= item.get('srvcClCode')
 
         return temp
     else:
