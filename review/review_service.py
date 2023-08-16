@@ -56,18 +56,13 @@ def put_review(request, review) -> ResponseDto:
     return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
 
 
-def get_all_review_list(order) -> ResponseDto:
+def get_all_review_list() -> ResponseDto:
     review_list = []
-    if order == 'cheer':
-        reviews = Review.objects.filter(is_public=True)  # 공개 여부가 True인 리뷰만 가져오도록 수정
-        reviews = reviews.annotate(num_cheers=Count('cheered_review')).order_by('-num_cheers')
-    else:
-        reviews = Review.objects.filter(is_public=True).order_by('-created_at')
+    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
         review_data["images"] = [image.image.url for image in images]
-        # review_data["num_cheers"] = review.num_cheers
         review_list.append(review_data)
     return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
 
