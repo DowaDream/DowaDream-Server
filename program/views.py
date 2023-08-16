@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from .service import *
 from .response import *
 from .serializers import *
-from .dto import ProgramDto
+from .search_service import *
 
 
 def responseFactory(res: ResponseDto):
@@ -32,23 +32,11 @@ parameter_token = openapi.Parameter(
 
 
 ### 봉사 추천 관련
-from django.db.models import Count
 class PrgmRecommendCheeringView(GenericAPIView):
     permission_classes = []
 
     def get(self, request):
-        interactions = Program_Interaction.objects.filter(cheered=True).annotate(cheer_count=Count('cheered')).order_by('-cheer_count')
-        progrmList = list(interactions.values_list('progrmRegistNo', flat=True))
-        
-        data = []
-        for program in progrmList[:4]:
-            p_data = callByRegistNo(program)
-            # print(p_data, p_data['tagName'])
-            program_dto_data = ProgramDto(tagName=p_data['tagName'], title=p_data['title'], registerInstitute=p_data['registerInstitute'], \
-                                          recruitStart=p_data['recruitStart'], recruitEnd=p_data['recruitEnd'], actStart=p_data['actStart'], actEnd=p_data['actEnd'])
-            data.append(program_dto_data.to_json())
-        
-        res = ResponseDto(status=200, data=data, msg=message['PrgrmRecommendCheer'])
+        res = get_cheer_recommend()
         return responseFactory(res)
 
 

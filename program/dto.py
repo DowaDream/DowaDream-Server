@@ -3,7 +3,7 @@ from datetime import datetime
 
 class ProgramDto:
     def __init__(self, tagName, title, registerInstitute, recruitStart, recruitEnd, actStart, actEnd):
-        self.tag = tagName.split()[0]
+        self.tag = tagName.split()[0]   # 태그(대분류)
         self.title = title  # 봉사 제목
         self.registerInstitute = registerInstitute  # 등록 기관
         self.recruitStart = recruitStart    # 모집 시작일
