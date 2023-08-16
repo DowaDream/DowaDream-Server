@@ -92,13 +92,14 @@ class UserReviewList(GenericAPIView):
     def get(self, request):
         '''
             ## 리뷰 리스트 조회(아직 정렬X)
-            - (작성자, 봉사번호 상관 없이) 모든 리뷰 조회: `/review/`
+            - Default값으로 신규순 정렬해서 모든 리뷰 조회하기: `/review/`
+            - 응원하기순으로 모든 리뷰 조회하기: `/review?order=cheer`
             - 특정 봉사에 대한 리뷰 조회: `/review?progrmRegistNo=xxx`
         '''
         progrmRegistNo = request.GET.get('progrmRegistNo')
         order = request.GET.get('order')
         if progrmRegistNo is None:
-            data = get_all_review_list()
+            data = get_all_review_list(order)
         else:
             data = get_review_list_in_progrm(progrmRegistNo)
         return responseFactory(data)
