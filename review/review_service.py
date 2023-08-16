@@ -62,15 +62,20 @@ def get_all_review_list() -> ResponseDto:
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
-        review_data["images"] = [image.image.url for image in images]
+        review_data["images"] = [str(image.image) for image in images]
         review_list.append(review_data)
     return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
 
 
 def get_user_review_list(user) -> ResponseDto:
+    review_list = []
     reviews = Review.objects.filter(writer=user).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
-    serializer = ReviewSerializer(reviews, many=True)  # Review 객체들을 직렬화
-    return ResponseDto(status=200, data=serializer.data, msg=message['UserReviewListGetSuccess'])
+    for review in reviews:
+        images = Image.objects.filter(review__rid=review.rid)
+        review_data = ReviewSerializer(review).data
+        review_data["images"] = [str(image.image) for image in images]
+        review_list.append(review_data)
+    return ResponseDto(status=200, data=review_list, msg=message['UserReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
@@ -79,7 +84,7 @@ def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
-        review_data["images"] = [image.image.url for image in images]
+        review_data["images"] = [str(image.image) for image in images]
         review_list.append(review_data)
     return ResponseDto(status=200, data=review_list, msg=message['ReviewListInProgramGetSuccess'])
 
@@ -89,7 +94,7 @@ def get_one_review(rid) -> ResponseDto:
         review = Review.objects.get(rid=rid)
         images = Image.objects.filter(review__rid=rid)
         review_data = ReviewSerializer(review).data
-        review_data["images"] = [image.image.url for image in images]
+        review_data["images"] = [str(image.image) for image in images]
         return ResponseDto(status=200, data=review_data, msg=message['ReviewGetSuccess'])
     except Review.DoesNotExist:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
