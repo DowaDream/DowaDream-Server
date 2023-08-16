@@ -121,14 +121,10 @@ class SearchKeywordView(APIView):
             ## 키워드로 조회
             - `keyword`: 검색할 키워드
             - `actPlace`: 장소 (필수 필드 아님) Ex. 상도
-            - `tagCode`: 분야코드 (필수 필드 아님) Ex. 0101
-            - `areaCode`: 지역코드 (필수 필드 아님) Ex. 3510000
         '''
         keyword = request.query_params.get('keyword')
         actPlace = request.query_params.get('actPlace')
-        tagCode = request.query_params.get('tagCode')
-        areaCode = request.query_params.get('areaCode')
-        search_result = callByKeyword(keyword, actPlace, tagCode, areaCode)
+        search_result = callByKeyword(keyword, actPlace)
         result = searchResponseFactory(search_result)
         if search_result is None:
             return Response(result,status=status.HTTP_404_NOT_FOUND)

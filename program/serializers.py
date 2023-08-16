@@ -13,10 +13,8 @@ class SwaggerInteractSerializer(serializers.ModelSerializer):
         exclude = ['user']
 
 class SearchKeywordSerializer(serializers.Serializer):
-    keyword = serializers.CharField(required=False)
+    keyword = serializers.CharField()
     actPlace = serializers.CharField(required=False)
-    tagCode = serializers.CharField(required=False)
-    areaCode = serializers.CharField(required=False)
 
 class SearchAreaSerializer(serializers.Serializer):
     keyword = serializers.CharField()
@@ -27,15 +25,7 @@ class SearchRegistNoSerializer(serializers.Serializer):
 class KeywordDictSerializer(serializers.Serializer):
     title = serializers.CharField()
     place = serializers.CharField()
-    tagCode = serializers.CharField()
-    areaCode = serializers.CharField()
-    recruitInstitute = serializers.CharField()
-    recruitStart = serializers.CharField()
-    recruitEnd = serializers.CharField()
-    actStart = serializers.CharField()
-    actEnd = serializers.CharField()
     progrmRegistNo = serializers.CharField()
-    dday = serializers.CharField()
 
 class KeywordResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
@@ -66,10 +56,6 @@ class RegistNoDictSerializer(serializers.Serializer):
     maxPerson = serializers.CharField()
     content = serializers.CharField()
     progrmRegistNo = serializers.CharField()
-    tagName = serializers.CharField()
-    url = serializers.CharField()
-    areaCode = serializers.CharField()
-    tagCode = serializers.CharField()
 
 class RegistNoResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
