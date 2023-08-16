@@ -20,7 +20,7 @@ def post_review(request) -> ResponseDto:
     
     # 봉사 tag 찾아와서 Review DB에 넣어주기
     program = callByRegistNo(mutable_data['progrmRegistNo'])
-    mutable_data['tag'] = program['tagName'].split()[0]
+    mutable_data['tag'] = program['tagCode']
     
     serializer = ReviewSerializer(data=mutable_data)
     if not serializer.is_valid():
@@ -47,6 +47,11 @@ def put_review(request, review) -> ResponseDto:
     # Review serializer & save
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id
+    
+    # 봉사 tag 찾아와서 Review DB에 넣어주기
+    program = callByRegistNo(mutable_data['progrmRegistNo'])
+    mutable_data['tag'] = program['tagCode']
+    
     serializer = ReviewSerializer(review, data=mutable_data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
