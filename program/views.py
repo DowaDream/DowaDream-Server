@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from .service import *
 from .response import *
 from .serializers import *
-from .search_service import *
+# from .search_service import *
 
 
 def responseFactory(res: ResponseDto):
