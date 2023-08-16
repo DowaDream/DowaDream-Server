@@ -38,10 +38,10 @@ parameter_token = openapi.Parameter(
 
 
 # 구글 로그인
-def google_login(request):
-    scope = "https://www.googleapis.com/auth/userinfo.email "
-    client_id = settings.GOOGLE_CLIENT_ID
-    return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
+# def google_login(request):
+    # scope = "https://www.googleapis.com/auth/userinfo.email "
+    # client_id = settings.GOOGLE_CLIENT_ID
+    # return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
 # Callback 함수
