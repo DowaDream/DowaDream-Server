@@ -3,6 +3,7 @@ from .response import *
 from .serializers import ReviewSerializer
 from .image_service import *
 from django.db.models import Count
+from user.service import get_userinfo
 
 
 def post_review(request) -> ResponseDto:
@@ -63,8 +64,28 @@ def get_reviews(reviews):
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
         review_data["images"] = [str(image.image) for image in images]
+        
+        # 작성자 이름, 작성자 프로필 가져오기
+        user = User.objects.get(id=review_data['writer'])
+        user_info = get_userinfo(user)
+        print(user_info)
+        review_data['writer_username'] = user.username
+        review_data['writer_profile_img'] = str(user.profile_img)
+        
+        review_data['num_cheer'] = get_cheered_review_count(review)
+        review_data['num_comment'] = get_comment_count(review)
+        
+        
         review_list.append(review_data)
     return review_list
+
+def get_cheered_review_count(review):
+    cheered_count = Cheered_Review.objects.filter(review=review).count()
+    return cheered_count
+
+def get_comment_count(review):
+    comment_count = Comment.objects.filter(review=review).count()
+    return comment_count
 
 
 def get_all_review_list() -> ResponseDto:
@@ -119,6 +140,7 @@ def cheer_review(user, rid) -> ResponseDto:
         return ResponseDto(status=201, msg=message['CheerReviewSuccess'])
     else:
         return ResponseDto(status=400, msg=message['AlreadyCheered'])
+
 
 def cancel_cheering_review(user, rid) -> ResponseDto:
     try:
