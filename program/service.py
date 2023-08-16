@@ -1,3 +1,4 @@
+
 from datetime import datetime
 import json
 import requests
@@ -10,6 +11,8 @@ from pathlib import Path
 from .response import *
 from .models import *
 from .serializers import *
+from .dto import ProgramDto
+from .search_service import *
 
 CURRENT_PATH = Path(__file__).parent.absolute()
 
@@ -47,6 +50,19 @@ def get_interactions_list(user, field_name):
     interations_list = list(interactions.values_list('progrmRegistNo', flat=True))  # flat=False: value 하나를 list로 저장
     return interations_list
 
+
+
+def get_cheer_recommend():
+    interactions = Program_Interaction.objects.filter(cheered=True).annotate(cheer_count=Count('cheered')).order_by('-cheer_count')
+    progrmList = list(interactions.values_list('progrmRegistNo', flat=True))
+    
+    data = []
+    for program in progrmList[:4]:
+        p_data = callByRegistNo(program)
+        program_dto_data = ProgramDto(tagName=p_data['tagName'], title=p_data['title'], registerInstitute=p_data['registerInstitute'], \
+                                        recruitStart=p_data['recruitStart'], recruitEnd=p_data['recruitEnd'], actStart=p_data['actStart'], actEnd=p_data['actEnd'])
+        data.append(program_dto_data.to_json())
+    return ResponseDto(status=200, data=data, msg=message['PrgrmRecommendCheer'])
 
 
 
@@ -292,3 +308,4 @@ def callByRegistNo(registNo):
         return temp
     else:
         return None
+
