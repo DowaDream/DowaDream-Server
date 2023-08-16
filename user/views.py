@@ -95,7 +95,8 @@ class UserInfoView(GenericAPIView):
             "user_regions": [ "관심지역3" ]
             `
         '''
-        res = get_userinfo(request.user)
+        user_info = get_userinfo(request.user)
+        res = ResponseDto(status=200, data=user_info, msg=message["UserInfoGetSuccess"])
         return responseFactory(res)
 
 class UsernameView(GenericAPIView):

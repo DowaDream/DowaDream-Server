@@ -71,7 +71,7 @@ def google_callback_signup(data, email, profile_img) -> ResponseDto:
 
 
 ### 유저 관련 ###
-def get_userinfo(user) -> ResponseDto:
+def get_userinfo(user):
     serializer = UserSerializer(user)
     user_info = serializer.data
     
@@ -82,8 +82,7 @@ def get_userinfo(user) -> ResponseDto:
 
     user_info['user_tags'] = [tag['tag'] for tag in user_tags_serializer.data]
     user_info['user_regions'] = [region['region'] for region in user_regions_serializer.data]
-    
-    return ResponseDto(status=200, data=user_info, msg=message["UserInfoGetSuccess"])
+    return user_info
 
 def update_username(request):
     new_name = request.data.get('username')
