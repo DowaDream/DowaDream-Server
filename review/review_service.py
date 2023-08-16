@@ -4,6 +4,7 @@ from .serializers import ReviewSerializer
 from .image_service import *
 from django.db.models import Count
 from user.service import get_userinfo
+from program.search_service import callByRegistNo
 
 
 def post_review(request) -> ResponseDto:
@@ -16,6 +17,11 @@ def post_review(request) -> ResponseDto:
     # Review serializer & save
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
+    
+    # 봉사 tag 찾아와서 Review DB에 넣어주기
+    program = callByRegistNo(mutable_data['progrmRegistNo'])
+    mutable_data['tag'] = program['tagName'].split()[0]
+    
     serializer = ReviewSerializer(data=mutable_data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
@@ -68,7 +74,6 @@ def get_reviews(reviews):
         # 작성자 이름, 작성자 프로필 가져오기
         user = User.objects.get(id=review_data['writer'])
         user_info = get_userinfo(user)
-        print(user_info)
         review_data['writer_username'] = user.username
         review_data['writer_profile_img'] = str(user.profile_img)
         
