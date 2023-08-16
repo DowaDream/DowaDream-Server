@@ -2,6 +2,7 @@ from .models import *
 from .response import *
 from .serializers import ReviewSerializer
 from .image_service import *
+from django.db.models import Count
 
 
 def post_review(request) -> ResponseDto:
@@ -57,7 +58,7 @@ def put_review(request, review) -> ResponseDto:
 
 def get_all_review_list() -> ResponseDto:
     review_list = []
-    reviews = Review.objects.all().order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
+    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data

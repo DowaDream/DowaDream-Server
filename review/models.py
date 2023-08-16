@@ -16,17 +16,12 @@ IS_PUBLIC_CHOICES = [
 ]
 
 class Review(BaseModel):
-    # 자동으로 들어가는 필드
     rid = models.AutoField(primary_key=True, verbose_name="봉사 ID")
     writer = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False, verbose_name="작성자")
-    
     progrmRegistNo = models.CharField(max_length=20, verbose_name="봉사 등록번호")
     title = models.CharField(max_length=100, verbose_name="제목")
     content = models.TextField(verbose_name="내용")
     is_public = models.BooleanField(choices=IS_PUBLIC_CHOICES, default=True, verbose_name="공개 여부(공개면 True)")
-    # tag = models.CharField(max_length=60, verbose_name="봉사 태그")
-    # region = models.CharField(max_length=30, verbose_name="봉사 지역(시군구 코드)")
-    # actPlace = models.CharField(max_length=60, verbose_name="봉사 장소")
 
 
 class Image(models.Model):

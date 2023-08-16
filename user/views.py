@@ -11,6 +11,7 @@ from rest_framework.generics import GenericAPIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from django.core.serializers import serialize
 
 
 from .service import *
@@ -70,6 +71,33 @@ class GoogleLogin(SocialLoginView):
 
 
 ### 유저 관련
+class UserInfoView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: 'Success',
+            401: '권한 없음'
+        })
+    def get(self, request):
+        '''
+            ## 유저 정보 조회
+            `
+            "id": 2,
+            "username": "이름",
+            "email": "pse314@gmail.com",
+            "date_joined": "2023-08-04T11:59:59.753534+09:00",
+            "profile_img": null,
+            "fighting": 5,
+            "resol_msg": "아자아자 파이팅",
+            "user_tags": [ "tag1", "tag2" ],
+            "user_regions": [ "관심지역3" ]
+            `
+        '''
+        res = get_userinfo(request.user)
+        return responseFactory(res)
+
 class UsernameView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DefaultSerializer
@@ -128,7 +156,7 @@ class FightingView(GenericAPIView):
 ### 유저 태그/지역 관련
 class UserTagView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = UserTagSerializer
+    serializer_class = UserTagListSerializer
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],
@@ -149,7 +177,7 @@ class UserTagView(GenericAPIView):
 
 class UserRegionView(GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = UserRegionSerializer
+    serializer_class = UserRegionListSerializer
     
     @swagger_auto_schema(
         manual_parameters = [parameter_token],

@@ -13,6 +13,7 @@ message = {
     "SignUpSuccess": "회원가입 성공",
     "SignUpFail": "회원가입 실패",
     
+    "UserInfoGetSuccess": "유저 정보 조회 성공",
     "UsernamePutSuccess": "유저네임 수정 성공",
     "UsernameIsEmpty": "유저네임이 비었음",
     "ResolMsgPutSuccess": "다짐 메세지 수정 성공",

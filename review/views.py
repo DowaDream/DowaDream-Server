@@ -70,10 +70,13 @@ class UserReviewList(GenericAPIView):
     def post(self, request):
         '''
             ## 리뷰 생성
-            - 밑의 필드 외에 images 필드도 넣어줘야 합니다
-            (현재 Swagger로 실행 못시킴, Postman으로 테스트 가능)
+            - 필수 필드: images, title, content, is_public, progrmRegistNo
+            - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
+            (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
             - 예시 사진
-            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230813133610303_APISpecCapture.png)
+            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230815155225195_captureImg.png)
+            - 유저는 봉사 당 하나의 리뷰만 남길 수 있음
+            - '내가 한 봉사 목록'에 있는 봉사에만 리뷰를 남길 수 있음
         '''
         res = post_review(request)
         if res.status >= 400:
@@ -89,7 +92,7 @@ class UserReviewList(GenericAPIView):
     def get(self, request):
         '''
             ## 리뷰 리스트 조회(아직 정렬X)
-            - (작성자, 봉사번호 상관 없이) 모든 리뷰 조회: `/review/`
+            - Default값으로 신규순 정렬해서 모든 리뷰 조회하기: `/review/`
             - 특정 봉사에 대한 리뷰 조회: `/review?progrmRegistNo=xxx`
         '''
         progrmRegistNo = request.GET.get('progrmRegistNo')
@@ -132,10 +135,11 @@ class UserReviewDetail(GenericAPIView):
     def put(self, request, rid):
         '''
             ## 리뷰 수정
-            - 밑의 필드 외에 images 필드도 넣어줘야 합니다
-            (현재 Swagger로 실행 못시킴, Postman으로 테스트 가능)
+            - 필수 필드: images, title, content, is_public, progrmRegistNo
+            - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
+            (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
             - 예시 사진
-            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230813133610303_APISpecCapture.png)
+            ![image](https://dowadream.s3.ap-northeast-2.amazonaws.com/20230815155225195_captureImg.png)
         '''
         review = get_object_or_404(Review, rid=rid)
         self.check_object_permissions(self.request, review) # 인가 체크
