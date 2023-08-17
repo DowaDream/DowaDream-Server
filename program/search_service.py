@@ -43,48 +43,39 @@ def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):
         itemsList = parsed_xml["response"]["body"]["items"]
         if itemsList is None:
             return None
-        items = itemsList['item']
+        item = itemsList['item']
         # 게시물이 여러개일 때는 items가 list인데, 하나일 때는 dict이기 때문에 분기를 나누어 처리
-        if type(items) is dict:
-            temp = {}
-            temp['title'] = items['progrmSj']
-            temp['place'] = items['actPlace']
-            temp['progrmRegistNo'] = items['progrmRegistNo']
 
-            result.append(temp)
-            return result
+        temp = {}
+        temp['title'] = item.get('progrmSj')
+        temp['place'] = item.get('actPlace')
+        temp['progrmRegistNo'] = item.get('progrmRegistNo')
+        temp['tagCode'] = tagCode
+        temp['areaCode'] = areaCode
+        temp['recruitInstitute'] = item.get('nanmmbyNm')
+        temp['url'] = item.get('url')
 
-        for item in items:
-            temp = {}
-            temp['title'] = item.get('progrmSj')
-            temp['place'] = item.get('actPlace')
-            temp['progrmRegistNo'] = item.get('progrmRegistNo')
-            temp['tagCode'] = tagCode
-            temp['areaCode'] = areaCode
-            temp['recruitInstitute'] = item.get('nanmmbyNm')
-            temp['url'] = item.get('url')
+        # yyyymmdd -> yyyy/mm/dd
+        unparsedRecStartDate = item.get('noticeBgnde')
+        temp['recruitStart'] = unparsedRecStartDate[0:4] + '/' + unparsedRecStartDate[4:6] + '/' + unparsedRecStartDate[6:8]
+        unparsedRecEndDate = item.get('noticeEndde')
+        temp['recruitEnd'] = unparsedRecEndDate[0:4] + '/' + unparsedRecEndDate[4:6] + '/' + unparsedRecEndDate[6:8]
 
-            # yyyymmdd -> yyyy/mm/dd
-            unparsedRecStartDate = item.get('noticeBgnde')
-            temp['recruitStart'] = unparsedRecStartDate[0:4] + '/' + unparsedRecStartDate[4:6] + '/' + unparsedRecStartDate[6:8]
-            unparsedRecEndDate = item.get('noticeEndde')
-            temp['recruitEnd'] = unparsedRecEndDate[0:4] + '/' + unparsedRecEndDate[4:6] + '/' + unparsedRecEndDate[6:8]
+        # yyyymmdd -> yyyy/mm/dd-hh:mm:ss
+        unparsedActStartDate = item.get('progrmBgnde')
+        unparsedActStartTime = item.get('actBeginTm')
+        # if unparsedActStartTime is smaller than 10, add 0
+        if int(unparsedActStartTime) < 10:
+            unparsedActStartTime = '0' + unparsedActStartTime
+        temp['actStart'] = unparsedActStartDate[0:4] + '/' + unparsedActStartDate[4:6] + '/' + unparsedActStartDate[6:8] + '-' + unparsedActStartTime + ':00:00'
+        unparsedActEndDate = item.get('progrmEndde')
+        unparsedActEndTime = item.get('actEndTm')
+        temp['actEnd'] = unparsedActEndDate[0:4] + '/' + unparsedActEndDate[4:6] + '/'+ unparsedActEndDate[6:8] + '-' + unparsedActEndTime + ':00:00'
 
-            # yyyymmdd -> yyyy/mm/dd-hh:mm:ss
-            unparsedActStartDate = item.get('progrmBgnde')
-            unparsedActStartTime = item.get('actBeginTm')
-            # if unparsedActStartTime is smaller than 10, add 0
-            if int(unparsedActStartTime) < 10:
-                unparsedActStartTime = '0' + unparsedActStartTime
-            temp['actStart'] = unparsedActStartDate[0:4] + '/' + unparsedActStartDate[4:6] + '/' + unparsedActStartDate[6:8] + '-' + unparsedActStartTime + ':00:00'
-            unparsedActEndDate = item.get('progrmEndde')
-            unparsedActEndTime = item.get('actEndTm')
-            temp['actEnd'] = unparsedActEndDate[0:4] + '/' + unparsedActEndDate[4:6] + '/'+ unparsedActEndDate[6:8] + '-' + unparsedActEndTime + ':00:00'
+        # d-day 계산 -> recruitEnd - today
+        temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
 
-            # d-day 계산 -> recruitEnd - today
-            temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
-
-            result.append(temp)
+        result.append(temp)
         # print(result)
         return result
     else:
