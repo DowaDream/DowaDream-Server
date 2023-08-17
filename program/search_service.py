@@ -18,7 +18,7 @@ def findTagCode(tagName):
         if tag['hignClsNm'] == tagNameHigh and tag['lowClsNm'] == tagNameLow:
             tagCodeHigh = tag['highClsCd']
             tagCodeLow = tag['lowClsCd']
-            return tagCodeLow
+            return tagCodeHigh
     return None
 
 def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):

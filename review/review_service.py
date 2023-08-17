@@ -88,8 +88,10 @@ def get_reviews(reviews):
         review_data['num_comment'] = get_comment_count(review)
         
         # 맞춤 후기인지 검사
-        # if review_data['']
-        
+        if review_data['tag'] in user_info['user_tags'] or review_data['region'] in user_info['user_regions']:
+            review_data['is_customized'] = True
+        else:
+            review_data['is_customized'] = False
         
         review_list.append(review_data)
     return review_list
