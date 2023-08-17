@@ -12,6 +12,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from django.core.serializers import serialize
+from django.core.exceptions import ObjectDoesNotExist
 
 
 from .service import *
@@ -35,7 +36,6 @@ parameter_token = openapi.Parameter(
     description = "access_token",
     type = openapi.TYPE_STRING
 )
-
 
 # 구글 로그인
 # def google_login(request):
@@ -74,21 +74,26 @@ class AccessTokenView(GenericAPIView):
             decoded_data = raw_data.decode('utf-8')
             json_data = json.loads(decoded_data)
 
-            google_access_token = json_data.get('access_token')
-            if google_access_token:
-                email, profile_img = get_google_profile(google_access_token)
-                try:
-                    user = User.objects.get(email=email)
+            username = json_data['userName']
+            email = json_data['email']
+            profile_img = json_data['profilePhoto']
 
-                    # 이미 Google로 제대로 가입된 유저 => 로그인
-                    res = google_callback_signin(user, email)
-                    return responseFactory(res)
+            if username is None or email is None or profile_img is None:
+                #return http bad request
+                return Response({"error": "Invalid JSON format in request body."}, status=status.HTTP_400_BAD_REQUEST)
 
-                except User.DoesNotExist:   # 회원가입
-                    res = google_callback_signup(email, profile_img)
+            users = User.objects.filter(email=email)
+
+            # 이미 Google로 제대로 가입된 유저 => 로그인
+            if users.exists():
+                user = users.first()
+                res = google_callback_signin(user, email)
                 return responseFactory(res)
+
             else:
-                return Response({"error": "Access token not found in request body."}, status=status.HTTP_400_BAD_REQUEST)
+            # when user does not exist
+                res = google_callback_signup(username, email, profile_img)
+                return responseFactory(res)
 
         except json.JSONDecodeError:
             return Response({"error": "Invalid JSON format in request body."}, status=status.HTTP_400_BAD_REQUEST)

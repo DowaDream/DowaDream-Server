@@ -57,15 +57,16 @@ def google_callback_signin(user, email) -> ResponseDto:
 
 
 # 회원가입
-def google_callback_signup(email, profile_img) -> ResponseDto:
+def google_callback_signup(username, email, profile_img) -> ResponseDto:
     # accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
     # accept_status = accept.status_code
 
     # if accept_status != 200:
         # return ResponseDto(status=accept_status, msg=message['SignUpFail'])
 
-    user = User.objects.get(email=email)
-    user.profile_img = profile_img  # profile_img 저장
+    user = User.objects.create_user(email=email, username=username)
+    # profile_img 저장
+    user.profile_img = profile_img
     user.save()  # 변경 내용을 저장
     data = make_token(email, user)
     return ResponseDto(status=201, msg=message['SignUpSuccess'], data=data)
