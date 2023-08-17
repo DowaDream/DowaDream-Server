@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import RefreshToken
 
 
-def make_token(email, accept, user):
+def make_token(email, user):
     # accept_json = accept.json()
     # accept_json.pop('user', None)
     token = RefreshToken.for_user(user)

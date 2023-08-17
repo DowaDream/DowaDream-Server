@@ -42,30 +42,30 @@ def get_google_profile(access_token):
 
 
 # 로그인
-def google_callback_signin(data, user, email) -> ResponseDto:
-    accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
-    accept_status = accept.status_code
+def google_callback_signin(user, email) -> ResponseDto:
+    # accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
+    # accept_status = accept.status_code
 
     # 로그인 과정에서 문제가 생기면 에러
-    if accept_status != 200:
-        return ResponseDto(status=accept_status, msg=message['SignInFail'])
+    # if accept_status != 200:
+        # return ResponseDto(status=accept_status, msg=message['SignInFail'])
     
-    data = make_token(email, accept, user)
+    data = make_token(email, user)
     return ResponseDto(status=200, msg=message['SignInSuccess'], data=data)
 
 
 # 회원가입
-def google_callback_signup(data, email, profile_img) -> ResponseDto:
-    accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
-    accept_status = accept.status_code
+def google_callback_signup(email, profile_img) -> ResponseDto:
+    # accept = requests.post(f"{BASE_URL}user/login/finish/", data=data)
+    # accept_status = accept.status_code
 
-    if accept_status != 200:
-        return ResponseDto(status=accept_status, msg=message['SignUpFail'])
+    # if accept_status != 200:
+        # return ResponseDto(status=accept_status, msg=message['SignUpFail'])
 
     user = User.objects.get(email=email)
     user.profile_img = profile_img  # profile_img 저장
     user.save()  # 변경 내용을 저장
-    data = make_token(email, accept, user)
+    data = make_token(email, user)
     return ResponseDto(status=201, msg=message['SignUpSuccess'], data=data)
 
 
