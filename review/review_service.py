@@ -18,9 +18,10 @@ def post_review(request) -> ResponseDto:
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
     
-    # 봉사 tag 찾아와서 Review DB에 넣어주기
+    # 봉사 정보 찾아와서 Review DB에 넣어주기
     program = callByRegistNo(mutable_data['progrmRegistNo'])
     mutable_data['tag'] = program['tagCode']
+    mutable_data['region'] = program['areaCode']
     
     serializer = ReviewSerializer(data=mutable_data)
     if not serializer.is_valid():
@@ -48,9 +49,10 @@ def put_review(request, review) -> ResponseDto:
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id
     
-    # 봉사 tag 찾아와서 Review DB에 넣어주기
+    # 봉사 정보 찾아와서 Review DB에 넣어주기
     program = callByRegistNo(mutable_data['progrmRegistNo'])
     mutable_data['tag'] = program['tagCode']
+    mutable_data['region'] = program['areaCode']
     
     serializer = ReviewSerializer(review, data=mutable_data)
     if not serializer.is_valid():
@@ -84,6 +86,9 @@ def get_reviews(reviews):
         
         review_data['num_cheer'] = get_cheered_review_count(review)
         review_data['num_comment'] = get_comment_count(review)
+        
+        # 맞춤 후기인지 검사
+        # if review_data['']
         
         
         review_list.append(review_data)

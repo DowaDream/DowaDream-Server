@@ -23,6 +23,7 @@ class Review(BaseModel):
     content = models.TextField(verbose_name="내용")
     is_public = models.BooleanField(choices=IS_PUBLIC_CHOICES, default=True, verbose_name="공개 여부(공개면 True)")
     tag = models.CharField(max_length=60, verbose_name="봉사 태그", blank=True)
+    region = models.CharField(max_length=60, verbose_name="구군 코드", blank=True)
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
