@@ -16,6 +16,7 @@ message = {
     "ParticipatedGetSuccess": "참여한 봉사 리스트 조회 성공",
     "ClippedGetSuccess": "스크랩한 봉사 리스트 조회 성공",
     
+    "UserGaugeGetSuccess": "유저 게이지 조회 성공",
 }
 
 def searchResponseFactory(result):

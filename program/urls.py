@@ -5,6 +5,7 @@ urlpatterns = [
     path('', PrgmInteractUpdateView.as_view()),
     
     path('recommend/cheer/', PrgmRecommendCheeringView.as_view()),
+    path('user/gauge/', UserGaugeView.as_view()),
     
     path('cheered/', CheeredGetView.as_view()),
     path('participated/', ParticipatedGetView.as_view()),

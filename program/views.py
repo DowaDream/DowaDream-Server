@@ -236,3 +236,24 @@ class SearchDdayView(APIView):
         if search_result is None:
             return Response(result,status=status.HTTP_404_NOT_FOUND)
         return Response(result,status=status.HTTP_200_OK)
+
+
+### 유저 게이지 관련
+class UserGaugeView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: message['ClippedGetSuccess'],
+            401: '권한 없음'
+        })
+    def get(self, request):
+        '''
+            ## 게이지 조회
+            - my_gauge: 로그인한 유저의 게이지
+            - best_gauge: 가장 높은 유저의 게이지
+            - total_gauge: 모든 유저의 게이지 총합
+        '''
+        res = get_user_gauge(request.user)
+        return responseFactory(res)
