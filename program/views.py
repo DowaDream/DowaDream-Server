@@ -218,29 +218,10 @@ class SearchDdayView(APIView):
         return Response(result,status=status.HTTP_200_OK)
 
 
-from django.db.models import Count
 ### 유저 게이지 관련
 class UserGaugeView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        user = request.user
-        
-        # 내가 한 봉사 점수(100점)
-        participated_count = Program_Interaction.objects.filter(user=user, participated=True).count()
-        # 내가 응원한 봉사 점수(30점)
-        cheered_count = Program_Interaction.objects.filter(user=user, cheered=True).count()
-        my_gauge = participated_count*100 + cheered_count*30
-        
-        users = User.objects.all()
-        best_gauge = 0
-        total_gauge = 0
-        for user in users:
-            participated_count = Program_Interaction.objects.filter(user=user, participated=True).count()
-            cheered_count = Program_Interaction.objects.filter(user=user, cheered=True).count()
-            current_gauge = participated_count*100 + cheered_count*30
-            best_gauge = max(best_gauge, current_gauge)
-            total_gauge += current_gauge
-        
-        print(total_gauge, best_gauge, my_gauge)
-        return Response(status=status.HTTP_200_OK)
+        res = get_user_gauge(request.user)
+        return responseFactory(res)

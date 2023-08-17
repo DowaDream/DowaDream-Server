@@ -59,3 +59,27 @@ def get_cheer_recommend():
                                         recruitStart=p_data['recruitStart'], recruitEnd=p_data['recruitEnd'], actStart=p_data['actStart'], actEnd=p_data['actEnd'])
         data.append(program_dto_data.to_json())
     return ResponseDto(status=200, data=data, msg=message['PrgrmRecommendCheer'])
+
+def get_user_gauge(user):
+    # 내가 한 봉사 점수(100점)
+    participated_count = Program_Interaction.objects.filter(user=user, participated=True).count()
+    # 내가 응원한 봉사 점수(30점)
+    cheered_count = Program_Interaction.objects.filter(user=user, cheered=True).count()
+    
+    my_gauge = participated_count*100 + cheered_count*30
+    
+    users = User.objects.all()
+    best_gauge = 0
+    total_gauge = 0
+    for user in users:
+        participated_count = Program_Interaction.objects.filter(user=user, participated=True).count()
+        cheered_count = Program_Interaction.objects.filter(user=user, cheered=True).count()
+        current_gauge = participated_count*100 + cheered_count*30
+        best_gauge = max(best_gauge, current_gauge)
+        total_gauge += current_gauge
+    data = {
+        "my_gauge": my_gauge,
+        "best_gauge": best_gauge,
+        "total_gauge": total_gauge
+    }
+    return ResponseDto(status=200, data=data, msg=message['UserGaugeGetSuccess'])
