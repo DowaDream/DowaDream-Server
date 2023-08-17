@@ -157,8 +157,14 @@ class SearchKeywordView(APIView):
 
         search_result = []
         threads = []
-        print(f"tagCodes: {tagCodes}, areaCodes: {areaCodes}")
+        # print(f"tagCodes: {tagCodes}, areaCodes: {areaCodes}")
         
+        # convert tagCodes, areaCodes to list
+        if type(tagCodes) is not list:
+            tagCodes = [tagCodes]
+        if type(areaCodes) is not list:
+            areaCodes = [areaCodes]
+
         for tagCode in tagCodes:
             for areaCode in areaCodes:
                 # 비동기로 요청
