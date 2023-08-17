@@ -222,6 +222,18 @@ class SearchDdayView(APIView):
 class UserGaugeView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     
+    @swagger_auto_schema(
+        manual_parameters = [parameter_token],
+        responses= {
+            200: message['ClippedGetSuccess'],
+            401: '권한 없음'
+        })
     def get(self, request):
+        '''
+            ## 게이지 조회
+            - my_gauge: 로그인한 유저의 게이지
+            - best_gauge: 가장 높은 유저의 게이지
+            - total_gauge: 모든 유저의 게이지 총합
+        '''
         res = get_user_gauge(request.user)
         return responseFactory(res)
