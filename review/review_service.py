@@ -3,6 +3,8 @@ from .response import *
 from .serializers import ReviewSerializer
 from .image_service import *
 from django.db.models import Count
+from user.service import get_userinfo
+from program.search_service import callByRegistNo
 
 
 def post_review(request) -> ResponseDto:
@@ -15,6 +17,12 @@ def post_review(request) -> ResponseDto:
     # Review serializer & save
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id    # 현재 로그인된 user를 writer로
+    
+    # 봉사 정보 찾아와서 Review DB에 넣어주기
+    program = callByRegistNo(mutable_data['progrmRegistNo'])
+    mutable_data['tag'] = program['tagCode']
+    mutable_data['region'] = program['areaCode']
+    
     serializer = ReviewSerializer(data=mutable_data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
@@ -40,6 +48,12 @@ def put_review(request, review) -> ResponseDto:
     # Review serializer & save
     mutable_data = request.data.copy()
     mutable_data['writer'] = request.user.id
+    
+    # 봉사 정보 찾아와서 Review DB에 넣어주기
+    program = callByRegistNo(mutable_data['progrmRegistNo'])
+    mutable_data['tag'] = program['tagCode']
+    mutable_data['region'] = program['areaCode']
+    
     serializer = ReviewSerializer(review, data=mutable_data)
     if not serializer.is_valid():
         return ResponseDto(status=400, msg=serializer.errors)
@@ -56,46 +70,67 @@ def put_review(request, review) -> ResponseDto:
     return ResponseDto(status=200, data=data, msg=message['ReviewPutSuccess'])
 
 
-def get_all_review_list() -> ResponseDto:
+# Code Refactoring: 반복되는 코드: 리뷰 리스트 조회하기
+def get_reviews(reviews):
     review_list = []
-    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
     for review in reviews:
         images = Image.objects.filter(review__rid=review.rid)
         review_data = ReviewSerializer(review).data
         review_data["images"] = [str(image.image) for image in images]
+        
+        # 작성자 이름, 작성자 프로필 가져오기
+        user = User.objects.get(id=review_data['writer'])
+        user_info = get_userinfo(user)
+        review_data['writer_username'] = user.username
+        review_data['writer_profile_img'] = str(user.profile_img)
+        
+        review_data['num_cheer'] = get_cheered_review_count(review)
+        review_data['num_comment'] = get_comment_count(review)
+        
+        # 맞춤 후기인지 검사
+        if review_data['tag'] in user_info['user_tags'] or review_data['region'] in user_info['user_regions']:
+            review_data['is_customized'] = True
+        else:
+            review_data['is_customized'] = False
+        
         review_list.append(review_data)
+    return review_list
+
+def get_cheered_review_count(review):
+    cheered_count = Cheered_Review.objects.filter(review=review).count()
+    return cheered_count
+
+def get_comment_count(review):
+    comment_count = Comment.objects.filter(review=review).count()
+    return comment_count
+
+
+def get_all_review_list() -> ResponseDto:
+    reviews = Review.objects.filter(is_public=True).order_by('-created_at')
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['AllReviewListGetSuccess'])
 
 
 def get_user_review_list(user) -> ResponseDto:
-    review_list = []
     reviews = Review.objects.filter(writer=user).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
-    for review in reviews:
-        images = Image.objects.filter(review__rid=review.rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        review_list.append(review_data)
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['UserReviewListGetSuccess'])
 
 
 def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
-    review_list = []
     reviews = Review.objects.filter(progrmRegistNo=progrmRegistNo).order_by('-created_at')  # created_at 필드 기준으로 내림차순 정렬
-    for review in reviews:
-        images = Image.objects.filter(review__rid=review.rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        review_list.append(review_data)
+    review_list = get_reviews(reviews)
     return ResponseDto(status=200, data=review_list, msg=message['ReviewListInProgramGetSuccess'])
 
 
 def get_one_review(rid) -> ResponseDto:
     try:
         review = Review.objects.get(rid=rid)
-        images = Image.objects.filter(review__rid=rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        return ResponseDto(status=200, data=review_data, msg=message['ReviewGetSuccess'])
+        review_data = get_reviews([review])
+        # images = Image.objects.filter(review__rid=rid)
+        # review_data = ReviewSerializer(review).data
+        # review_data["images"] = [str(image.image) for image in images]
+        return ResponseDto(status=200, data=review_data[0], msg=message['ReviewGetSuccess'])
     except Review.DoesNotExist:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
@@ -123,6 +158,7 @@ def cheer_review(user, rid) -> ResponseDto:
         return ResponseDto(status=201, msg=message['CheerReviewSuccess'])
     else:
         return ResponseDto(status=400, msg=message['AlreadyCheered'])
+
 
 def cancel_cheering_review(user, rid) -> ResponseDto:
     try:

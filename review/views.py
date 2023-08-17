@@ -71,7 +71,7 @@ class UserReviewList(GenericAPIView):
         '''
             ## 리뷰 생성
             - 필수 필드: images, title, content, is_public, progrmRegistNo
-            - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
+            - rid, writer, tag, region 등의 필드는 백엔드에서 자동으로 넣습니다
             (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
             - 유저는 봉사 당 하나의 리뷰만 남길 수 있음
             - '내가 한 봉사 목록'에 있는 봉사에만 리뷰를 남길 수 있음
@@ -134,7 +134,7 @@ class UserReviewDetail(GenericAPIView):
         '''
             ## 리뷰 수정
             - 필수 필드: images, title, content, is_public, progrmRegistNo
-            - rid, writer 등의 필드는 백엔드에서 자동으로 넣습니다
+            - rid, writer, tag, region 등의 필드는 백엔드에서 자동으로 넣습니다
             (현재 이미지는 Swagger로 못 보냄, Postman으로 테스트 가능)
         '''
         review = get_object_or_404(Review, rid=rid)
