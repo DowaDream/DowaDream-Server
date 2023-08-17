@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
+import threading
 
 from .service import *
 from .search_service import *
@@ -30,6 +31,11 @@ parameter_token = openapi.Parameter(
     description = "access_token",
     type = openapi.TYPE_STRING
 )
+
+def callAndAddRes(storage, keyword, actPlace, tagCode, areaCode):
+    temp = callByKeyword(keyword, actPlace, tagCode, areaCode)
+    if temp is not None:
+        storage += temp
 
 
 ### 봉사 추천 관련
@@ -146,10 +152,26 @@ class SearchKeywordView(APIView):
         '''
         keyword = request.query_params.get('keyword')
         actPlace = request.query_params.get('actPlace')
-        tagCode = request.query_params.get('tagCode')
-        areaCode = request.query_params.get('areaCode')
-        search_result = callByKeyword(keyword, actPlace, tagCode, areaCode)
+        tagCodes = request.query_params.getlist('tagCode')
+        areaCodes = request.query_params.getlist('areaCode')
+
+        search_result = []
+        threads = []
+        print(f"tagCodes: {tagCodes}, areaCodes: {areaCodes}")
+        
+        for tagCode in tagCodes:
+            for areaCode in areaCodes:
+                # 비동기로 요청
+                thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, tagCode, areaCode))
+                thread.start()
+                threads.append(thread)                
+        
+        # 모든 서버가 끝날때까지 대기
+        for thread in threads:
+            thread.join()
+
         result = searchResponseFactory(search_result)
+
         if search_result is None:
             return Response(result,status=status.HTTP_404_NOT_FOUND)
         return Response(result,status=status.HTTP_200_OK)

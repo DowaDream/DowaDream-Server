@@ -18,72 +18,18 @@ def findTagCode(tagName):
         if tag['hignClsNm'] == tagNameHigh and tag['lowClsNm'] == tagNameLow:
             tagCodeHigh = tag['highClsCd']
             tagCodeLow = tag['lowClsCd']
-            return tagCodeLow
+            return tagCodeHigh
     return None
 
 def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):
     url = 'http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrSearchWordList'
     
-    if type(tagCode) is list and type(areaCode) is list:
-        result = []
-        for tag in tagCode:
-            for area in areaCode:
-                params = {
-                    'keyword' : keyword,
-                    'schCateGu' : 'all',
-                    'actPlace' : actPlace,
-                    'schSign1' : area,
-                    'nanmClCode' : tag,
-                    'numOfRows' : 50
-                    }
-                response = requests.get(url, params=params)
-                parsed_xml = xmltodict.parse(response.text)
-                if parsed_xml["response"]["header"]["resultCode"] == "00":
-                    result = []
-                    itemsList = parsed_xml["response"]["body"]["items"]
-                    if itemsList is None:
-                        return None
-                    items = itemsList['item']
-                    for item in items:
-                        temp = {}
-                        temp['title'] = item.get('progrmSj')
-                        temp['place'] = item.get('actPlace')
-                        temp['progrmRegistNo'] = item.get('progrmRegistNo')
-                        temp['tagCode'] = tagCode
-                        temp['areaCode'] = areaCode
-                        temp['recruitInstitute'] = item.get('nanmmbyNm')
-                        temp['url'] = item.get('url')
-
-                        # yyyymmdd -> yyyy/mm/dd
-                        unparsedRecStartDate = item.get('noticeBgnde')
-                        temp['recruitStart'] = unparsedRecStartDate[0:4] + '/' + unparsedRecStartDate[4:6] + '/' + unparsedRecStartDate[6:8]
-                        unparsedRecEndDate = item.get('noticeEndde')
-                        temp['recruitEnd'] = unparsedRecEndDate[0:4] + '/' + unparsedRecEndDate[4:6] + '/' + unparsedRecEndDate[6:8]
-
-                        # yyyymmdd -> yyyy/mm/dd-hh:mm:ss
-                        unparsedActStartDate = item.get('progrmBgnde')
-                        unparsedActStartTime = item.get('actBeginTm')
-                        # if unparsedActStartTime is smaller than 10, add 0
-                        if int(unparsedActStartTime) < 10:
-                            unparsedActStartTime = '0' + unparsedActStartTime
-                        temp['actStart'] = unparsedActStartDate[0:4] + '/' + unparsedActStartDate[4:6] + '/' + unparsedActStartDate[6:8] + '-' + unparsedActStartTime + ':00:00'
-                        unparsedActEndDate = item.get('progrmEndde')
-                        unparsedActEndTime = item.get('actEndTm')
-                        temp['actEnd'] = unparsedActEndDate[0:4] + '/' + unparsedActEndDate[4:6] + '/'+ unparsedActEndDate[6:8] + '-' + unparsedActEndTime + ':00:00'
-
-                        # d-day 계산 -> recruitEnd - today
-                        temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
-                        result.append(temp)
-                    return result
-                else:
-                    return None
-        
     params = {
         'keyword' : keyword,
         'schCateGu' : 'all',
         'actPlace' : actPlace,
         'schSign1' : areaCode,
-        'nanmClCode' : tagCode,
+        'upperClCode' : tagCode,
         'numOfRows' : 50
         }
     response = requests.get(url, params=params)
