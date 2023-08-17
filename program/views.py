@@ -158,19 +158,33 @@ class SearchKeywordView(APIView):
         search_result = []
         threads = []
         # print(f"tagCodes: {tagCodes}, areaCodes: {areaCodes}")
-        
+        print("tagcodes:", tagCodes, "areacodes:", areaCodes)
         # convert tagCodes, areaCodes to list
-        if type(tagCodes) is not list:
-            tagCodes = [tagCodes]
-        if type(areaCodes) is not list:
-            areaCodes = [areaCodes]
+        if len(tagCodes) == 0:
+            tagCodes = None
+        if len(areaCodes) == 0:
+            areaCodes = None
 
-        for tagCode in tagCodes:
+        # 둘 중 하나가 none 일 때
+        if tagCodes is None and areaCodes is not None:
             for areaCode in areaCodes:
-                # 비동기로 요청
-                thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, tagCode, areaCode))
+                thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, None, areaCode))
                 thread.start()
-                threads.append(thread)                
+                threads.append(thread)
+        elif areaCodes is None and tagCodes is not None:
+            for tagCode in tagCodes:
+                thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, tagCode, None))
+                thread.start()
+                threads.append(thread)
+
+        # 둘 다 none 이 아닐 때
+        else:
+            for tagCode in tagCodes:
+                for areaCode in areaCodes:
+                    # 비동기로 요청
+                    thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, tagCode, areaCode))
+                    thread.start()
+                    threads.append(thread)                
         
         # 모든 서버가 끝날때까지 대기
         for thread in threads:
