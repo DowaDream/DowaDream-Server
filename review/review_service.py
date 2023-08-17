@@ -126,10 +126,11 @@ def get_review_list_in_progrm(progrmRegistNo) -> ResponseDto:
 def get_one_review(rid) -> ResponseDto:
     try:
         review = Review.objects.get(rid=rid)
-        images = Image.objects.filter(review__rid=rid)
-        review_data = ReviewSerializer(review).data
-        review_data["images"] = [str(image.image) for image in images]
-        return ResponseDto(status=200, data=review_data, msg=message['ReviewGetSuccess'])
+        review_data = get_reviews([review])
+        # images = Image.objects.filter(review__rid=rid)
+        # review_data = ReviewSerializer(review).data
+        # review_data["images"] = [str(image.image) for image in images]
+        return ResponseDto(status=200, data=review_data[0], msg=message['ReviewGetSuccess'])
     except Review.DoesNotExist:
         return ResponseDto(status=404, msg=message['ReviewNotFound'])
 
