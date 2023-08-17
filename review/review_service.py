@@ -8,7 +8,7 @@ from program.search_service import callByRegistNo
 
 
 def post_review(request) -> ResponseDto:
-    images = request.data.getlist('images', [])  # 기본 값을 빈 리스트로 지정
+    images = request.data.getlist('images', []) if 'images' in request.data else ['']
     if len(images[0]) == 0:     # 자동으로 ['']이 들어가기 때문에 한번 더 체크
         images = []
     elif len(images) > 5:
