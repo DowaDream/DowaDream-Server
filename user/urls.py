@@ -2,10 +2,10 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('login/', google_login, name='google_login'),
-    path('callback/', google_callback, name='google_callback'),
+    # path('login/', google_login, name='google_login'),
+    # path('callback/', google_callback, name='google_callback'),
     # path('login/finish/', GoogleLogin.as_view(), name='google_login_todjango'),
-    path('get-token/', ), 
+    path('get-token/', AccessTokenView.as_view()), 
     
     path('info/', UserInfoView.as_view()),
     path('resol/', ResolMsgView.as_view()),

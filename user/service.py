@@ -11,21 +11,23 @@ BASE_URL = settings.BASE_URL
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/callback/'
 
 
+### !!! access token 발급 !!! ###
+
 ### 구글 로그인 관련 ###
-def get_google_access_token(code):
-    client_id = settings.GOOGLE_CLIENT_ID
-    client_secret = settings.GOOGLE_PASSWORD
-    state = "random_state"
+# def get_google_access_token(code):
+#     client_id = settings.GOOGLE_CLIENT_ID
+#     client_secret = settings.GOOGLE_PASSWORD
+#     state = "random_state"
 
-    token_req = requests.post(f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
-    token_req_json = token_req.json()
-    error = token_req_json.get("error")
+#     token_req = requests.post(f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
+#     token_req_json = token_req.json()
+#     error = token_req_json.get("error")
 
-    if error is not None:
-        raise JSONDecodeError(error)
+#     if error is not None:
+#         raise JSONDecodeError(error)
     
-    access_token = token_req_json.get('access_token')
-    return access_token
+#     access_token = token_req_json.get('access_token')
+#     return access_token
 
 def get_google_profile(access_token):
     # 가져온 access_token으로 사용자 정보를 구글에 요청

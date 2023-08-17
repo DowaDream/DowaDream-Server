@@ -38,18 +38,18 @@ parameter_token = openapi.Parameter(
 
 
 # 구글 로그인
-def google_login(request):
-    scope = "https://www.googleapis.com/auth/userinfo.email "
-    client_id = settings.GOOGLE_CLIENT_ID
-    return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
+# def google_login(request):
+#     scope = "https://www.googleapis.com/auth/userinfo.email "
+#     client_id = settings.GOOGLE_CLIENT_ID
+#     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
 # Callback 함수
-def google_callback(request):
-    code = request.GET.get('code')
-    access_token = get_google_access_token(code)
-    print(access_token)
-    return access_token
+# def google_callback(request):
+#     code = request.GET.get('code')
+#     access_token = get_google_access_token(code)
+#     print(access_token)
+#     return access_token
     # email, profile_img = get_google_profile(access_token)
 
     # try:
@@ -70,25 +70,21 @@ import json
 class AccessTokenView(GenericAPIView):
     def post(self, request):
         try:
-            # request body에서 원시 바이트 데이터를 가져옴
             raw_data = request.body
             decoded_data = raw_data.decode('utf-8')
             json_data = json.loads(decoded_data)
 
             google_access_token = json_data.get('access_token')
-            # google_code = json_data.get('token')
             if google_access_token:
                 email, profile_img = get_google_profile(google_access_token)
                 try:
                     user = User.objects.get(email=email)
 
                     # 이미 Google로 제대로 가입된 유저 => 로그인
-                    # data = {'access_token': access_token, 'code': code}
                     res = google_callback_signin(user, email)
                     return responseFactory(res)
 
                 except User.DoesNotExist:   # 회원가입
-                    # data = {'access_token': access_token, 'code': code}
                     res = google_callback_signup(email, profile_img)
                 return responseFactory(res)
             else:
@@ -98,10 +94,10 @@ class AccessTokenView(GenericAPIView):
             return Response({"error": "Invalid JSON format in request body."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GoogleLogin(SocialLoginView):
-    adapter_class = google_view.GoogleOAuth2Adapter
-    callback_url = GOOGLE_CALLBACK_URI
-    client_class = OAuth2Client
+# class GoogleLogin(SocialLoginView):
+#     adapter_class = google_view.GoogleOAuth2Adapter
+#     callback_url = GOOGLE_CALLBACK_URI
+#     client_class = OAuth2Client
 
 
 ### 유저 관련
