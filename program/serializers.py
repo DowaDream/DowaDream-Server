@@ -72,6 +72,7 @@ class RegistNoDictSerializer(serializers.Serializer):
     url = serializers.CharField()
     areaCode = serializers.CharField()
     tagCode = serializers.CharField()
+    dday = serializers.CharField()
 
 class RegistNoResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
