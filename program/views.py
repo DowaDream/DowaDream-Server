@@ -165,8 +165,14 @@ class SearchKeywordView(APIView):
         if len(areaCodes) == 0:
             areaCodes = None
 
+        # 둘 다 none 일 때
+        if tagCodes is None and areaCodes is None:
+            thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, None, None))
+            thread.start()
+            threads.append(thread)
+
         # 둘 중 하나가 none 일 때
-        if tagCodes is None and areaCodes is not None:
+        elif tagCodes is None and areaCodes is not None:
             for areaCode in areaCodes:
                 thread = threading.Thread(target=callAndAddRes, args=(search_result,keyword, actPlace, None, areaCode))
                 thread.start()
