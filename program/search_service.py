@@ -178,6 +178,7 @@ def callByRegistNo(registNo):
         temp['url'] = f"https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo={registNo}"
         temp['areaCode'] = item.get('gugunCd')
         temp['tagCode'] = findTagCode(temp['tagName'])
+        temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
 
         return temp
     else:
