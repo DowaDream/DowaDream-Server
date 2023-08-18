@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import json
 
 from pathlib import Path
+
+from program.models import Program_Interaction
 CURRENT_PATH = Path(__file__).parent.absolute()
 
 def findTagCode(tagName):
@@ -178,7 +180,20 @@ def callByRegistNo(registNo):
         temp['url'] = f"https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo={registNo}"
         temp['areaCode'] = item.get('gugunCd')
         temp['tagCode'] = findTagCode(temp['tagName'])
-
+        
+        # 해당 봉사의 스크랩수/응원하기수
+        clipped_count = Program_Interaction.objects.filter(progrmRegistNo=registNo, clipped=True).count()
+        cheered_count = Program_Interaction.objects.filter(progrmRegistNo=registNo, cheered=True).count()
+        
+        # 해당 봉사의 스크랩 및 응원 데이터가 없을 경우 0으로 처리
+        if not clipped_count:
+            clipped_count = 0
+        if not cheered_count:
+            cheered_count = 0
+        
+        temp['clipped_count'] = clipped_count
+        temp['cheered_count'] = cheered_count
+        
         return temp
     else:
         return None
