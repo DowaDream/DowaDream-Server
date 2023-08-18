@@ -28,7 +28,6 @@ def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):
     
     params = {
         'keyword' : keyword,
-        'schCateGu' : 'all',
         'actPlace' : actPlace,
         'schSign1' : areaCode,
         'upperClCode' : tagCode,
@@ -36,7 +35,7 @@ def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):
         }
     response = requests.get(url, params=params)
     parsed_xml = xmltodict.parse(response.text)
-
+    print(f"tagCode: {tagCode}, areaCode: {areaCode}")
     # myjson = json.dumps(parsed_xml,ensure_ascii = False)
     # print(myjson)
 
@@ -47,6 +46,8 @@ def callByKeyword(keyword, actPlace=None, tagCode=None, areaCode=None):
             return None
         items = itemsList['item']
         # 게시물이 여러개일 때는 items가 list인데, 하나일 때는 dict이기 때문에 분기를 나누어 처리
+        if type(items) is dict:
+            items = [items]
         for item in items:
             temp = {}
             temp['title'] = item.get('progrmSj')
