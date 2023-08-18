@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import json
 
 from pathlib import Path
+
+from program.models import Program_Interaction
 CURRENT_PATH = Path(__file__).parent.absolute()
 
 def findTagCode(tagName):
@@ -180,6 +182,20 @@ def callByRegistNo(registNo):
         temp['tagCode'] = findTagCode(temp['tagName'])
         temp['dday'] = (datetime.strptime(temp['recruitEnd'], '%Y/%m/%d') - datetime.today()).days
 
+        
+        # 해당 봉사의 스크랩수/응원하기수
+        clipped_count = Program_Interaction.objects.filter(progrmRegistNo=registNo, clipped=True).count()
+        cheered_count = Program_Interaction.objects.filter(progrmRegistNo=registNo, cheered=True).count()
+        
+        # 해당 봉사의 스크랩 및 응원 데이터가 없을 경우 0으로 처리
+        if not clipped_count:
+            clipped_count = 0
+        if not cheered_count:
+            cheered_count = 0
+        
+        temp['clipped_count'] = clipped_count
+        temp['cheered_count'] = cheered_count
+        
         return temp
     else:
         return None
