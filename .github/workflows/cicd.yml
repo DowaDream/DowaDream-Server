@@ -2,7 +2,7 @@ name: DowaDream CI/CD
 
 on: # action을 언제 실행할지 설정
   push:
-    branches: ["main"]  # main 브랜치가 push될 때마다 github action이 실행됨
+    branches: []  # main 브랜치가 push될 때마다 github action이 실행됨
 
 jobs:
   CI:
